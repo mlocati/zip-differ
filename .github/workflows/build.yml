@@ -36,8 +36,8 @@ jobs:
         id: check-changes
         if: github.event_name == 'push'
         run: |
-          git add docs
-          if git diff --quiet --exit-code docs; then
+          git add --all docs
+          if git diff-index --name-status --exit-code HEAD docs; then
             echo 'No changes detected.'
           else
             echo 'Changes detected.'
@@ -49,5 +49,6 @@ jobs:
         run: |
           git config --local user.name 'GitHub Actions'
           git config --local user.email noreply@github.com
+          git add --all docs
           git commit -m 'Update docs'
           git push
