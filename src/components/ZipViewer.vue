@@ -6,6 +6,10 @@ const props = defineProps<{
     zipEntry: ZipDirectory|ZipFile;
 }>();
 
+const emit = defineEmits<{
+  (e: 'zipFileClicked', zipFile: ZipFile): void,
+}>()
+
 const isOpen = ref<Boolean>(false);
 const isFolder = computed<Boolean>(() => props.zipEntry instanceof ZipDirectory);
 
@@ -16,22 +20,24 @@ onMounted(() => {
     
 });
 
-function toggle()
+function click()
 {
-    if (isFolder.value) {
+    if (props.zipEntry instanceof ZipDirectory) {
         isOpen.value = !isOpen.value;
+    } else if (props.zipEntry instanceof ZipFile) {
+        emit('zipFileClicked', props.zipEntry);
     }
 }
 </script>
 
 <template>
     <li :class="isFolder ? (isOpen ? 'folder-open' : 'folder-closed') : 'file'">
-        <span @click.prevent="toggle()" :title="props.zipEntry instanceof ZipFile ? props.zipEntry.sizeFormatted : ''">
+        <a href="#" @click.prevent="click()" :title="props.zipEntry instanceof ZipFile ? props.zipEntry.sizeFormatted : ''">
             {{ props.zipEntry instanceof ZipArchive ? props.zipEntry.zipFilename : props.zipEntry.name }}
-        </span>
+        </a>
         <ul v-if="isFolder" v-show="isOpen">
-            <ZipViewer v-for="subdir in (<ZipDirectory>props.zipEntry).subdirs" :key="subdir.name" :zipEntry="subdir" />
-            <ZipViewer v-for="file in (<ZipDirectory>props.zipEntry).files" :key="file.name" :zipEntry="file" />
+            <ZipViewer v-for="subdir in (<ZipDirectory>props.zipEntry).subdirs" :key="subdir.name" :zipEntry="subdir" @zipFileClicked="emit('zipFileClicked', $event)" />
+            <ZipViewer v-for="file in (<ZipDirectory>props.zipEntry).files" :key="file.name" :zipEntry="file" @zipFileClicked="emit('zipFileClicked', $event)" />
         </ul>
     </li>
 </template>

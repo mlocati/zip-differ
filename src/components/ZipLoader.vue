@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue';
-import { readFile, readArrayByffer, ZipArchive } from '../ZipArchive';
+import { readFile, readArrayByffer, ZipArchive, ZipFile } from '../ZipArchive';
 import ZipViewer from './ZipViewer.vue';
 
 const dropArea = ref<HTMLElement>();
@@ -18,7 +18,8 @@ const props = defineProps({
 });
 
 const emit = defineEmits<{
-  (e: 'zipPicked', file: ZipArchive|null): void
+  (e: 'zipPicked', zipArchive: ZipArchive|null): void,
+  (e: 'zipFileClicked', zipFile: ZipFile): void,
 }>()
 
 watch(zipArchive, (zip) => {
@@ -183,7 +184,7 @@ onMounted(() => {
         </main>
         <main v-else class="contents">
             <ul>
-                <ZipViewer :zipEntry="zipArchive" />
+                <ZipViewer :zipEntry="zipArchive" @zipFileClicked="emit('zipFileClicked', $event)" />
             </ul>
             <div>
             </div>
