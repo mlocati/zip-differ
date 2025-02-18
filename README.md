@@ -1,5 +1,33 @@
-# Vue 3 + TypeScript + Vite
+# Zip Differ
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+## Compilation
 
-Learn more about the recommended Project Setup and IDE Support in the [Vue Docs TypeScript Guide](https://vuejs.org/guide/typescript/overview.html#project-setup).
+Install dependencies (keeping the configured one)
+
+```sh
+npm ci
+```
+
+Install dependencies (updating to the latest available versions)
+
+```sh
+npm install
+```
+
+Build for development
+
+```sh
+npm run dev
+```
+
+Build for previewing production
+
+```sh
+npm run preview
+```
+
+Build for production
+
+```sh
+npm run build
+```
