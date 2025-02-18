@@ -1,30 +1,61 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
+import { computed, ref } from 'vue';
+import ZipLoader from './components/ZipLoader.vue'
+import { ZipArchive } from './ZipArchive';
+
+enum Side {
+  Left,
+  Right,
+}
+
+const leftZip = ref<ZipArchive|null>(null);
+const rightZip = ref<ZipArchive|null>(null);
+
+const canCompare = computed<boolean>(() => leftZip.value !== null && rightZip.value !== null);
+
+async function zipLoaded(zip: ZipArchive|null, side: Side) {
+  switch (side) {
+    case Side.Left:
+      leftZip.value = zip;
+      break;
+    case Side.Right:
+      rightZip.value = zip;
+      break;
+  }
+}
+
+function compare()
+{
+  if (!canCompare.value) {
+    return;
+  }
+  window.alert('@todo');
+}
 </script>
 
 <template>
-  <div>
-    <a href="https://vite.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
+  <header>
+    <h1>Zip Differ</h1>
+    <button class="btn btn-primary" @click="compare()" :disabled="!canCompare">Compare</button>
+  </header>
+  <div class="input-files">
+    <ZipLoader queryStringParam="left" @zipPicked="zipLoaded($event, Side.Left)" />
+    <ZipLoader queryStringParam="right" @zipPicked="zipLoaded($event, Side.Right)" />
   </div>
-  <HelloWorld msg="Vite + Vue" />
 </template>
 
 <style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 10px;
 }
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+.input-files {
+  flex: 1;
+  display: flex;
 }
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
+.input-files > * {
+  flex: 1;
 }
 </style>
