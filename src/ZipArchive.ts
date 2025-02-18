@@ -5,6 +5,10 @@ class ZipEntry
 {
     readonly name: string;
     readonly parent: ZipDirectory|null;
+    get path(): string
+    {
+        return (this.parent?.path.replace(/\/$/, '') || '') + '/' + this.name;
+    }
     constructor(name: string, parent: ZipDirectory|null)
     {
         this.name = name;
