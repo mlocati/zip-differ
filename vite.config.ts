@@ -10,5 +10,9 @@ export default defineConfig({
         quietDeps: true
       }
     }
-  }
+  },
+  build: {
+    outDir: 'docs',
+    emptyOutDir: true,
+  },
 })
