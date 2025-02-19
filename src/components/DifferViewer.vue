@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue';
 import { DiffDirectory, DiffFile, type DiffArchive, type DiffEntry } from '../Differ';
 import { ZipFile } from '../ZipArchive';
+import { Tooltip } from 'bootstrap';
 
 const props = defineProps<{
     diffArchive: DiffArchive,
@@ -34,8 +35,6 @@ class FlatEntry
             } else {
                 clickedDirs.value.push(this.entry);
             }
-        } else {
-            window.alert('@todo');
         }
     }
 }
@@ -74,6 +73,15 @@ function getEntryClasses(entry: DiffEntry): string
     result.push(entry instanceof DiffFile ? 'diff-file' : 'diff-directory');
     return result.join(' ');
 }
+
+const vBootstrapTooltip = {
+    mounted: (el: HTMLElement) => new Tooltip(el)
+};
+
+function viewDiffFile(diffFile: DiffFile): void
+{
+    window.alert(`@todo ${diffFile.name}`);
+}1
 </script>
 
 <template>
@@ -87,30 +95,39 @@ function getEntryClasses(entry: DiffEntry): string
         <colgroup>
             <col width="30">
             <col width="30">
+            <col width="30">
         </colgroup>
         <tbody>
             <template v-for="entry in flatEntries">
                 <tr :class="getEntryClasses(entry.entry)">
-                    <td class="text-center">
+                    <td class="action">
                         <template v-if="entry.entry.left instanceof ZipFile">
-                            <a class="btn btn-sm btn-info p-0" href="#" @click.prevent="emit('zipFileClicked', <ZipFile>entry.entry.left)" title="View left file">
+                            <a class="btn btn-sm btn-info p-0" href="#" @click.prevent="emit('zipFileClicked', <ZipFile>entry.entry.left)" v-bootstrap-tooltip title="View left file">
                                 &#x1F441;
                             </a>
                         </template>
                     </td>
-                    <td class="text-center">
+                    <td class="action">
                         <template v-if="entry.entry.right instanceof ZipFile">
-                            <a class="btn btn-sm btn-info p-0" href="#" @click.prevent="emit('zipFileClicked', <ZipFile>entry.entry.right)" title="View right file">
+                            <a class="btn btn-sm btn-info p-0" href="#" @click.prevent="emit('zipFileClicked', <ZipFile>entry.entry.right)" v-bootstrap-tooltip title="View right file">
+                                &#x1F441;
+                            </a>
+                        </template>
+                    </td>
+                    <td class="action">
+                        <template v-if="entry.entry instanceof DiffFile && entry.entry.isDifferent">
+                            <a class="btn btn-sm btn-warning p-0" href="#" v-bootstrap-tooltip title="View diff" @click.prevent="viewDiffFile(entry.entry)">
                                 &#x1F441;
                             </a>
                         </template>
                     </td>
                     <td :style="{'padding-left': `${entry.depth * 20}px`}">
-                        <a href="#" @click.prevent="entry.click()">
-                            <span v-if="entry.entry instanceof DiffFile">
-                                &#x00bb;
-                            </span>
-                            <span v-else-if="clickedDirs.includes(<any>entry.entry)">
+                        <span v-if="entry.entry instanceof DiffFile">
+                            &#x00bb;
+                            {{ entry.entry.name }}
+                        </span>
+                        <a v-else-if="entry.entry instanceof DiffDirectory" href="#" @click.prevent="entry.click()">
+                            <span v-if="clickedDirs.includes(<any>entry.entry)">
                                 &#x229e;
                             </span>
                             <span v-else>
@@ -127,7 +144,9 @@ function getEntryClasses(entry: DiffEntry): string
 </template>
 
 <style lang="css" scoped>
-tr>:nth-child(1), tr>:nth-child(2) {
+tr>.action {
+    text-align: center;
+    width: 30px;
     background-color: #fff!important;
 }
 tr, tr>* {
