@@ -6,7 +6,7 @@ import { FileFormat } from '../FileFormat';
 import { getFileFormatsFromFilename } from '../FileFormat';
 import Image from './FileViewer/Image.vue';
 import Text from './FileViewer/Text.vue';
-import Binary from './FileViewer/Binary.vue';
+import Info from './FileViewer/Info.vue';
 
 const props = defineProps<{
     zipFile: ZipFile,
@@ -40,6 +40,6 @@ onMounted(() => {
     <div>
         <Image v-if="currentFormat === FileFormat.Image" :zipFile="props.zipFile" />
         <Text v-else-if="currentFormat === FileFormat.Text" :zipFile="props.zipFile" />
-        <Binary v-else :zipFile="props.zipFile" />
+        <Info v-else :zipFile="props.zipFile" />
     </div>
 </template>
