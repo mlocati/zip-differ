@@ -113,6 +113,15 @@ async function loadFromURL(urlString: string): Promise<boolean>
     return true;
 }
 
+function setZipArchive(zip: ZipArchive|null)
+{
+    zipArchive.value = zip;
+}
+
+defineExpose({
+    setZipArchive,
+});
+
 onMounted(() => {
     dropArea.value?.addEventListener('dragover', (e) => {
         e.preventDefault();

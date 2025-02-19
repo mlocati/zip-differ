@@ -11,9 +11,16 @@ enum Side {
   Right,
 }
 
+const viewingZipFile = ref<ZipFile|null>(null);
+const viewingZipFileModal = ref<HTMLDivElement>();
+const viewingZipFileModalClose = ref<HTMLButtonElement>();
+const leftZipLoader = ref<typeof ZipLoader>();
+const rightZipLoader = ref<typeof ZipLoader>();
+
 const leftZip = ref<ZipArchive|null>(null);
 const rightZip = ref<ZipArchive|null>(null);
 
+const canSwap = computed<boolean>(() => leftZipLoader.value && rightZipLoader.value && (leftZip.value !== null || rightZip.value !== null));
 const canCompare = computed<boolean>(() => leftZip.value !== null && rightZip.value !== null);
 
 function zipLoaded(zip: ZipArchive|null, side: Side): void
@@ -28,9 +35,6 @@ function zipLoaded(zip: ZipArchive|null, side: Side): void
   }
 }
 
-const viewingZipFile = ref<ZipFile|null>(null);
-const viewingZipFileModal = ref<HTMLDivElement>();
-const viewingZipFileModalClose = ref<HTMLButtonElement>();
 
 function viewZipFile(zipFile: ZipFile): void
 {
@@ -57,6 +61,14 @@ function viewZipFile(zipFile: ZipFile): void
   });
 }
 
+function swap(): void
+{
+  const left = leftZip.value;
+  const right = rightZip.value;
+  leftZipLoader.value?.setZipArchive(right);
+  rightZipLoader.value?.setZipArchive(left);
+}
+
 function compare(): void
 {
   if (!canCompare.value) {
@@ -69,11 +81,14 @@ function compare(): void
 <template>
   <header>
     <h1>Zip Differ</h1>
-    <button class="btn btn-primary" @click="compare()" :disabled="!canCompare">Compare</button>
+    <div>
+      <button class="btn btn-info me-2" @click="swap()" :disabled="!canSwap">Swap</button>
+      <button class="btn btn-primary" @click="compare()" :disabled="!canCompare">Compare</button>
+    </div>
   </header>
   <div class="input-files">
-    <ZipLoader queryStringParam="left" @zipPicked="zipLoaded($event, Side.Left)" @zipFileClicked="viewZipFile($event)" />
-    <ZipLoader queryStringParam="right" @zipPicked="zipLoaded($event, Side.Right)" @zipFileClicked="viewZipFile($event)"  />
+    <ZipLoader ref="leftZipLoader" queryStringParam="left" @zipPicked="zipLoaded($event, Side.Left)" @zipFileClicked="viewZipFile($event)" />
+    <ZipLoader ref="rightZipLoader" queryStringParam="right" @zipPicked="zipLoaded($event, Side.Right)" @zipFileClicked="viewZipFile($event)"  />
   </div>
   <div class="modals-container">
     <div ref="viewingZipFileModal" class="modal">
