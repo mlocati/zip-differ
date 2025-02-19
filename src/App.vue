@@ -5,6 +5,8 @@ import ZipLoader from './components/ZipLoader.vue'
 import { ZipArchive, ZipFile } from './ZipArchive';
 import FileViewer from './components/FileViewer.vue';
 import FileViewerActions from './components/FileViewer/Actions.vue';
+import { DiffArchive } from './Differ';
+import DifferViewer from './components/DifferViewer.vue';
 
 enum Side {
   Left,
@@ -17,10 +19,13 @@ const viewingZipFileModalClose = ref<HTMLButtonElement>();
 const leftZipLoader = ref<typeof ZipLoader>();
 const rightZipLoader = ref<typeof ZipLoader>();
 
+const viewingDiff = ref<DiffArchive|null>(null);
+const viewingDiffModal = ref<HTMLDivElement>();
+
 const leftZip = ref<ZipArchive|null>(null);
 const rightZip = ref<ZipArchive|null>(null);
 
-const canSwap = computed<boolean>(() => leftZipLoader.value && rightZipLoader.value && (leftZip.value !== null || rightZip.value !== null));
+const canSwap = computed<boolean>(() => !!leftZipLoader.value && !!rightZipLoader.value && (leftZip.value !== null || rightZip.value !== null));
 const canCompare = computed<boolean>(() => leftZip.value !== null && rightZip.value !== null);
 
 function zipLoaded(zip: ZipArchive|null, side: Side): void
@@ -74,7 +79,29 @@ function compare(): void
   if (!canCompare.value) {
     return;
   }
-  window.alert('@todo');
+  const diff = new DiffArchive(leftZip.value!, rightZip.value!);
+  if (!diff.isDifferent) {
+    window.alert('The archives are identical.');
+    return;
+  }
+  viewingDiff.value = diff;
+  nextTick(() => {
+    if (!viewingDiff.value) {
+      return;
+    }
+    const el = viewingDiffModal.value;
+    if (!el) {
+      return;
+    }
+    let modal = bootstrap.Modal.getInstance(el);
+    if (!modal) {
+      modal = new bootstrap.Modal(el);
+      el.addEventListener('hidden.bs.modal', () => {
+        viewingDiff.value = null;
+      });
+    }
+    modal.show();
+  });
 }
 </script>
 
@@ -91,6 +118,7 @@ function compare(): void
     <ZipLoader ref="rightZipLoader" queryStringParam="right" @zipPicked="zipLoaded($event, Side.Right)" @zipFileClicked="viewZipFile($event)"  />
   </div>
   <div class="modals-container">
+
     <div ref="viewingZipFileModal" class="modal">
       <div class="modal-dialog modal-xl modal-dialog-scrollable">
         <div class="modal-content">
@@ -108,7 +136,25 @@ function compare(): void
         </div>
       </div>
     </div>
-  </div>
+
+    <div ref="viewingDiffModal" class="modal">
+      <div class="modal-dialog modal-fullscreen modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Differences detected</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <DifferViewer v-if="viewingDiff" :diffArchive="viewingDiff" />
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+</div>
 </template>
 
 <style scoped>

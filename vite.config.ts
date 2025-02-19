@@ -14,6 +14,7 @@ export default defineConfig({
   build: {
     outDir: 'docs',
     emptyOutDir: true,
+    chunkSizeWarningLimit: 600,
   },
   base: '/zip-differ/'
 })

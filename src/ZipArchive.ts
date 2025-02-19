@@ -1,7 +1,7 @@
 import JSZip from 'jszip'
 import { formatSize } from './Size';
 
-class ZipEntry
+export abstract class ZipEntry
 {
     readonly name: string;
     readonly parent: ZipDirectory|null;
