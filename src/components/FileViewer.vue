@@ -26,11 +26,17 @@ onMounted(() => {
 
 </script>
 <template>
-    <div class="btn-group mb-3" v-if="fileFormats.length > 0">
-        <a v-if="fileFormats.includes(FileFormat.Image)" href="#" class="btn btn-primary" @click.prevent="currentFormat = FileFormat.Image" :class="{active: currentFormat === FileFormat.Image}">Image</a>
-        <a v-if="fileFormats.includes(FileFormat.Text)" href="#" class="btn btn-primary" @click.prevent="currentFormat = FileFormat.Text" :class="{active: currentFormat === FileFormat.Text}">Text</a>
-        <a href="#" class="btn btn-primary" @click.prevent="currentFormat = null"  :class="{active: currentFormat === null}">Info</a>
-    </div>
+    <ul class="nav nav-tabs mb-2" v-if="fileFormats.length > 0">
+        <li class="nav-item" v-if="fileFormats.includes(FileFormat.Image)">
+            <a class="nav-link" :class="{active: currentFormat === FileFormat.Image}" href="#" @click.prevent="currentFormat = FileFormat.Image">Image</a>
+        </li>
+        <li class="nav-item" v-if="fileFormats.includes(FileFormat.Text)">
+            <a class="nav-link" :class="{active: currentFormat === FileFormat.Text}" href="#" @click.prevent="currentFormat = FileFormat.Text">Text</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" :class="{active: currentFormat === null}" href="#" @click.prevent="currentFormat = null">Info</a>
+        </li>
+    </ul>
     <div>
         <Image v-if="currentFormat === FileFormat.Image" :zipFile="props.zipFile" />
         <Text v-else-if="currentFormat === FileFormat.Text" :zipFile="props.zipFile" />
