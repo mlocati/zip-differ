@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, onMounted, watch } from 'vue';
 import { ZipFile } from '../../ZipArchive';
 import { getBeautifierFromFilename, type Beautifier } from '../../Beautifier';
+import { beautifierApplied, beautifierExists } from "./Data";
 
 const props = defineProps<{
     zipFile: ZipFile,
@@ -15,20 +16,21 @@ const beautifier = computed<Beautifier|null>(() => {
     return getBeautifierFromFilename(props.zipFile.name);
 }); 
 
-const beautify = ref<boolean>(false);
-
 const displayText = computed<string>(() => {
-    return beautifier.value && beautify.value ? beautifier.value(text.value) : text.value;
+    return beautifier.value !== null && beautifierApplied.value ? beautifier.value(text.value) : text.value;
 });
 
+watch(beautifier, (newBeautifier) => {
+    beautifierExists.value = newBeautifier !== null;
+});
+
+onMounted(() => {
+    beautifierExists.value = beautifier.value !== null;
+});
 </script>
 
 <template>
     <div>{{ displayText }}</div>
-    <label class="form-check" v-if="beautifier !== null">
-        <input type="checkbox" class="form-check-input" v-model="beautify" />
-        <span class="form-check">format</span>
-    </label>
 </template>
 
 <style lang="css" scoped>
