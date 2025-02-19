@@ -16,7 +16,8 @@ const rightZip = ref<ZipArchive|null>(null);
 
 const canCompare = computed<boolean>(() => leftZip.value !== null && rightZip.value !== null);
 
-async function zipLoaded(zip: ZipArchive|null, side: Side) {
+function zipLoaded(zip: ZipArchive|null, side: Side): void
+{
   switch (side) {
     case Side.Left:
       leftZip.value = zip;
@@ -29,6 +30,7 @@ async function zipLoaded(zip: ZipArchive|null, side: Side) {
 
 const viewingZipFile = ref<ZipFile|null>(null);
 const viewingZipFileModal = ref<HTMLDivElement>();
+const viewingZipFileModalClose = ref<HTMLButtonElement>();
 
 function viewZipFile(zipFile: ZipFile): void
 {
@@ -37,22 +39,25 @@ function viewZipFile(zipFile: ZipFile): void
     if (!viewingZipFile.value) {
       return;
     }
-    const el: HTMLDivElement|undefined = viewingZipFileModal.value;
+    const el = viewingZipFileModal.value;
     if (!el) {
       return;
     }
-    let modal: bootstrap.Modal|null = bootstrap.Modal.getInstance(el);
+    let modal = bootstrap.Modal.getInstance(el);
     if (!modal) {
-      modal = new bootstrap.Modal(el, { keyboard: true });
+      modal = new bootstrap.Modal(el);
       el.addEventListener('hidden.bs.modal', () => {
         viewingZipFile.value = null;
+      });
+      el.addEventListener('shown.bs.modal', () => {
+        nextTick(() => viewingZipFileModalClose.value?.focus());
       });
     }
     modal.show();
   });
 }
 
-function compare()
+function compare(): void
 {
   if (!canCompare.value) {
     return;
@@ -83,7 +88,7 @@ function compare()
           </div>
           <div class="modal-footer">
             <FileViewerActions />
-            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal" ref="viewingZipFileModalClose">Close</button>
           </div>
         </div>
       </div>

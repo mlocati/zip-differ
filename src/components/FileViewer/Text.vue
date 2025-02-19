@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, watch } from 'vue';
+import { computed, onBeforeUnmount, onMounted, watch } from 'vue';
 import { ZipFile } from '../../ZipArchive';
 import { getBeautifierFromFilename, type Beautifier } from '../../Beautifier';
 import { beautifierApplied, beautifierExists } from "./Data";
@@ -32,8 +32,26 @@ watch(beautifier, (newBeautifier) => {
 onMounted(() => {
     beautifierExists.value = beautifier.value !== null;
 });
+
+onBeforeUnmount(() => {
+    beautifierApplied.value = false;
+    beautifierExists.value = false;
+});
 </script>
 
 <template>
-    <highlightjs :autodetect="highlightJsLanguage === ''" :language="highlightJsLanguage" :code="displayText" />
+    <div class="zip-differ">
+        <highlightjs :autodetect="highlightJsLanguage === ''" :language="highlightJsLanguage" :code="displayText" />
+    </div>
 </template>
+<style lang="css" scoped>
+.zip-differ
+{
+ 	border: 0.0625rem solid #3d444d;
+	border-radius: 0.375rem !important;
+}
+.zip-differ > pre
+{
+    margin: 0;
+}
+</style>

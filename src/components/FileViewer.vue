@@ -26,12 +26,12 @@ onMounted(() => {
 
 </script>
 <template>
-    <div class="btn-group">
+    <div class="btn-group mb-3" v-if="fileFormats.length > 0">
         <a v-if="fileFormats.includes(FileFormat.Image)" href="#" class="btn btn-primary" @click.prevent="currentFormat = FileFormat.Image" :class="{active: currentFormat === FileFormat.Image}">Image</a>
         <a v-if="fileFormats.includes(FileFormat.Text)" href="#" class="btn btn-primary" @click.prevent="currentFormat = FileFormat.Text" :class="{active: currentFormat === FileFormat.Text}">Text</a>
         <a href="#" class="btn btn-primary" @click.prevent="currentFormat = null"  :class="{active: currentFormat === null}">Info</a>
     </div>
-    <div class="mt-3">
+    <div>
         <Image v-if="currentFormat === FileFormat.Image" :zipFile="props.zipFile" />
         <Text v-else-if="currentFormat === FileFormat.Text" :zipFile="props.zipFile" />
         <Binary v-else :zipFile="props.zipFile" />

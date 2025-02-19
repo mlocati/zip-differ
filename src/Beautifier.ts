@@ -12,6 +12,16 @@ export function beautifyCSS(code: string): string
     return beautify.css(code);
 }
 
+export function beautifyXML(code: string): string
+{
+    return beautify.html(code);
+}
+
+export function beautifyHtml(code: string): string
+{
+    return beautify.html(code);
+}
+
 export function getBeautifierFromFilename(filename: string): Beautifier|null
 {
     return getBeautifierFromExtension(filename.split('.').pop() || '');
@@ -26,6 +36,11 @@ export function getBeautifierFromExtension(extension: string): Beautifier|null
             return beautifyJavascript;
         case 'css':
             return beautifyCSS;
+        case 'htm':
+        case 'html':
+            return beautifyHtml;
+        case 'xml':
+            return beautifyXML;
         default:
             return null;
     }

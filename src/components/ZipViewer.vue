@@ -47,6 +47,14 @@ li {
     list-style: none;
     margin-left: -0.5rem;
 }
+li a {
+    text-decoration: none;
+    color: inherit;
+}
+li a:hover {
+    color: var(--bs-link-color);
+    text-decoration: underline;
+}
 li span.bold {
     font-weight: bold;
 }
