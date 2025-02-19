@@ -32,7 +32,7 @@ const displaySize = computed<string>(() => formatSize(size.value));
             </tr>
             <tr>
                 <th>Size (in bytes)</th>
-                <td>{{ size }}</td>
+                <td>{{ size.toLocaleString('en-US') }}</td>
             </tr>
         </tbody>
     </table>
