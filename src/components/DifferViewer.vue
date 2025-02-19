@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { DiffDirectory, DiffFile, type DiffArchive, type DiffEntry } from '../Differ';
+import { ZipFile } from '../ZipArchive';
 
 const props = defineProps<{
     diffArchive: DiffArchive,
@@ -8,6 +9,10 @@ const props = defineProps<{
 
 const showUnchanged = ref<boolean>(false);
 const clickedDirs = ref<DiffDirectory[]>([]);
+
+const emit = defineEmits<{
+  (e: 'zipFileClicked', zipFile: ZipFile): void,
+}>()
 
 class FlatEntry
 {
@@ -42,7 +47,7 @@ function flatten(result: FlatEntry[], dir: DiffDirectory, parent: FlatEntry|null
     }
     const depth = parent ? parent.depth + 1 : 0;
     dir.subdirs.forEach((subdir) => {
-        if (!showUnchanged.value && !subdir.isDifferent) {
+        if (!showUnchanged.value && !subdir.isDifferent && subdir.notes === '') {
             return;
         }
         const subdirFlat = new FlatEntry(subdir, depth, parent);
@@ -50,7 +55,7 @@ function flatten(result: FlatEntry[], dir: DiffDirectory, parent: FlatEntry|null
         flatten(result, subdir, subdirFlat);
     });
     dir.files.forEach((file) => {
-        if (!showUnchanged.value && !file.isDifferent) {
+        if (!showUnchanged.value && !file.isDifferent && file.notes === '') {
             return;
         }
         result.push(new FlatEntry(file, depth, parent));
@@ -79,9 +84,27 @@ function getEntryClasses(entry: DiffEntry): string
         </label>
     </div>
     <table class="table table-sm table-hover">
+        <colgroup>
+            <col width="30">
+            <col width="30">
+        </colgroup>
         <tbody>
             <template v-for="entry in flatEntries">
                 <tr :class="getEntryClasses(entry.entry)">
+                    <td class="text-center">
+                        <template v-if="entry.entry.left instanceof ZipFile">
+                            <a class="btn btn-sm btn-info p-0" href="#" @click.prevent="emit('zipFileClicked', <ZipFile>entry.entry.left)" title="View left file">
+                                &#x1F441;
+                            </a>
+                        </template>
+                    </td>
+                    <td class="text-center">
+                        <template v-if="entry.entry.right instanceof ZipFile">
+                            <a class="btn btn-sm btn-info p-0" href="#" @click.prevent="emit('zipFileClicked', <ZipFile>entry.entry.right)" title="View right file">
+                                &#x1F441;
+                            </a>
+                        </template>
+                    </td>
                     <td :style="{'padding-left': `${entry.depth * 20}px`}">
                         <a href="#" @click.prevent="entry.click()">
                             <span v-if="entry.entry instanceof DiffFile">
@@ -104,6 +127,9 @@ function getEntryClasses(entry: DiffEntry): string
 </template>
 
 <style lang="css" scoped>
+tr>:nth-child(1), tr>:nth-child(2) {
+    background-color: #fff!important;
+}
 tr, tr>* {
     border-width: 0;
 }

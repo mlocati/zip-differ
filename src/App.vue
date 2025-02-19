@@ -119,7 +119,7 @@ function compare(): void
   </div>
   <div class="modals-container">
 
-    <div ref="viewingZipFileModal" class="modal">
+    <div ref="viewingZipFileModal" class="modal" style="z-index: calc(var(--bs-modal-zindex) + 1);">
       <div class="modal-dialog modal-xl modal-dialog-scrollable">
         <div class="modal-content">
           <div class="modal-header">
@@ -145,7 +145,7 @@ function compare(): void
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <DifferViewer v-if="viewingDiff" :diffArchive="viewingDiff" />
+            <DifferViewer v-if="viewingDiff" :diffArchive="viewingDiff" @zipFileClicked="viewZipFile($event)" />
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
