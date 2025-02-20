@@ -29,12 +29,12 @@ function click()
 
 <template>
     <li :class="isFolder ? (isOpen ? 'folder-open' : 'folder-closed') : 'file'">
-        <a href="#" @click.prevent="click()" :title="props.zipEntry instanceof ZipFile ? props.zipEntry.sizeFormatted : ''">
-            {{ props.zipEntry instanceof ZipArchive ? props.zipEntry.zipFilename : props.zipEntry.name }}
+        <a href="#" @click.prevent="click()" :title="zipEntry instanceof ZipFile ? zipEntry.sizeFormatted : ''" :class="{'fw-bold': zipEntry instanceof ZipArchive}">
+            {{ zipEntry instanceof ZipArchive ? zipEntry.zipFilename : zipEntry.name }}
         </a>
         <ul v-if="isFolder" v-show="isOpen">
-            <Entry v-for="subdir in (<ZipDirectory>props.zipEntry).subdirs" :key="subdir.name" :zipEntry="subdir" />
-            <Entry v-for="file in (<ZipDirectory>props.zipEntry).files" :key="file.name" :zipEntry="file" />
+            <Entry v-for="subdir in (<ZipDirectory>zipEntry).subdirs" :key="subdir.name" :zipEntry="subdir" />
+            <Entry v-for="file in (<ZipDirectory>zipEntry).files" :key="file.name" :zipEntry="file" />
         </ul>
     </li>
 </template>
