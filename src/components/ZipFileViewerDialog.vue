@@ -7,7 +7,6 @@ import ZipFileViewer from './ZipFileViewer.vue';
 
 const viewingZipFile = ref<ZipFile|null>(null);
 const viewingZipFileModal = ref<HTMLDivElement>();
-const viewingZipFileModalClose = ref<HTMLButtonElement>();
 
 function viewZipFile(zipFile: ZipFile): void
 {
@@ -26,9 +25,6 @@ function viewZipFile(zipFile: ZipFile): void
       el.addEventListener('hidden.bs.modal', () => {
         viewingZipFile.value = null;
       });
-      el.addEventListener('shown.bs.modal', () => {
-        nextTick(() => viewingZipFileModalClose.value?.focus());
-      });
     }
     modal.show();
   });
@@ -43,7 +39,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div ref="viewingZipFileModal" class="modal">
+    <div ref="viewingZipFileModal" class="modal" tabindex="-1">
       <div class="modal-dialog modal-xl modal-dialog-scrollable">
         <div class="modal-content">
           <div class="modal-header">
@@ -54,7 +50,7 @@ onUnmounted(() => {
             <ZipFileViewer v-if="viewingZipFile" :zipFile="viewingZipFile" />
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-primary" data-bs-dismiss="modal" ref="viewingZipFileModalClose">Close</button>
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
           </div>
         </div>
       </div>
