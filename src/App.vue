@@ -27,8 +27,8 @@ function diffReady(diffArchive: DiffArchive): void
       <button class="btn btn-primary" @click.prevent="zipLoader.compare()" :disabled="!zipLoader.canCompare">Compare</button>
     </div>
   </header>
-  <ZipLoader v-if="viewingDiff === null" ref="zipLoader" @diffReady="diffReady" />
-  <DiffArchiveViewer v-else :diffArchive="viewingDiff" />
+  <ZipLoader v-show="viewingDiff === null" ref="zipLoader" @diffReady="diffReady" />
+  <DiffArchiveViewer v-if="viewingDiff !== null" :diffArchive="viewingDiff" />
   <div class="modals-container">
     <ZipFileViewerDialog  />
 </div>
