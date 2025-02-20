@@ -43,7 +43,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div ref="viewingZipFileModal" class="modal" style="z-index: calc(var(--bs-modal-zindex) + 1);">
+    <div ref="viewingZipFileModal" class="modal">
       <div class="modal-dialog modal-xl modal-dialog-scrollable">
         <div class="modal-content">
           <div class="modal-header">
