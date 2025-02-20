@@ -5,6 +5,13 @@ export abstract class ZipEntry
 {
     readonly name: string;
     readonly parent: ZipDirectory|null;
+    get zipArchive(): ZipArchive
+    {
+        if (this instanceof ZipArchive) {
+            return <ZipArchive>this;
+        }
+        return this.parent!.zipArchive;
+    }
     get path(): string
     {
         return (this.parent?.path.replace(/\/$/, '') || '') + '/' + this.name;
