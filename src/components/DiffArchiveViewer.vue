@@ -82,7 +82,7 @@ function viewDiffFile(diffFile: DiffFile): void
 </script>
 
 <template>
-    <section>
+    <section class="container-fluid">
         <div class="text-end">
             <label>
                 <input type="checkbox" v-model="showUnchanged">
@@ -113,7 +113,7 @@ function viewDiffFile(diffFile: DiffFile): void
                             </template>
                         </td>
                         <td class="action">
-                            <template v-if="entry.entry instanceof DiffFile && entry.entry.isDifferent">
+                            <template v-if="entry.entry instanceof DiffFile && entry.entry.left !== null && entry.entry.right !== null && entry.entry.isDifferent">
                                 <a class="btn btn-sm btn-warning p-0" href="#" v-bootstrap-tooltip title="View diff" @click.prevent="viewDiffFile(entry.entry)">
                                     &#x1F441;
                                 </a>

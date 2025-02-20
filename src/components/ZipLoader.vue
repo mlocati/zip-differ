@@ -65,15 +65,15 @@ defineExpose({
 </script>
 
 <template>
-    <div class="sides">
+    <section class="container-fluid">
         <Side ref="leftZipLoader" queryStringParam="left" @zipPicked="zipLoaded($event, Sides.Left)" />
         <Side ref="rightZipLoader" queryStringParam="right" @zipPicked="zipLoaded($event, Sides.Right)" />
-  </div>
+  </section>
 </template>
 <style lang="css" scoped>
-.sides {
-  flex: 1;
+section {
   display: flex;
+  flex: 1;
 }
 .sides>* {
   flex: 1;
