@@ -4,9 +4,9 @@ import { computed, onMounted, ref, watch } from 'vue';
 import { ZipFile } from '../ZipArchive';
 import { FileFormat } from '../FileFormat';
 import { getFileFormatsFromFilename } from '../FileFormat';
-import Image from './FileViewer/Image.vue';
-import Text from './FileViewer/Text.vue';
-import Info from './FileViewer/Info.vue';
+import Image from './ZipFileViewer/Image.vue';
+import Text from './ZipFileViewer/Text.vue';
+import Info from './ZipFileViewer/Info.vue';
 
 const props = defineProps<{
     zipFile: ZipFile,
