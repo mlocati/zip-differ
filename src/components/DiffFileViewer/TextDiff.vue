@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, ref, useId, watch } from 'vue';
 import { type Differ, getDiffersFromFilename, getFormatterFromFilename, type Formatter } from '../../FileInfo';
 import type { DiffFile } from '../../Differ';
+
+const uniqueID = useId();
 
 const props = defineProps<{
     diffFile: DiffFile,
@@ -22,6 +24,16 @@ const rightDisplayText = computed<string>(() => applyFormatter.value && formatte
 const differs = computed<Differ[]>(() => getDiffersFromFilename(props.diffFile.name)!);
 
 const differ = ref<Differ>(differs.value[0]);
+
+const differencesDetected = computed<boolean>(() => {
+    const changes = differ.value.apply(leftDisplayText.value, rightDisplayText.value);
+    for (const change of changes) {
+        if (change.added || change.removed) {
+            return true;
+        }
+    }
+    return false;
+});
 
 const diffHtml = computed<string>(() => {
     const changes = differ.value.apply(leftDisplayText.value, rightDisplayText.value);
@@ -50,16 +62,21 @@ watch(differs, (newDiffers: Differ[]) => {
 </script>
 
 <template>
-    <div>
-        <select v-model="differ">
-            <option v-for="differ in differs" :value="differ">{{ differ.name }}</option>
-        </select>
-        <label v-if="formatter !== null">
-            <input type="checkbox" v-model="applyFormatter" />
-            {{ formatter.actionName }}
-        </label>
+    <div class="row mb-2">
+        <div class="col">
+            <select v-model="differ" class="form-control">
+                <option v-for="differ in differs" :value="differ">{{ differ.name }}</option>
+            </select>
+        </div>
+        <div class="col pt-1">
+            <div v-if="formatter !== null" class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch" :id="`zd-td-apply-formatter-${uniqueID}`" v-model="applyFormatter" />
+                <label class="form-check-label" :for="`zd-td-apply-formatter-${uniqueID}`">{{ formatter.actionName }}</label>
+            </div>
+        </div>
     </div>
-    <div class="diff text-muted" v-html="diffHtml"></div>
+    <div v-if="!differencesDetected" class="alert alert-success">No differences detected</div>
+    <div v-else class="diff text-muted" v-html="diffHtml"></div>
 </template>
 
 <style lang="css">
