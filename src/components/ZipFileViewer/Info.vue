@@ -31,6 +31,10 @@ defineProps<{
                 <th>Size (in bytes)</th>
                 <td>{{ zipFile.size.toLocaleString('en-US') }}</td>
             </tr>
+            <tr>
+                <th></th>
+                <td><button class="btn btn-info" @click.prevent="zipFile.download()">&#x2BAF; Download</button></td>
+            </tr>
         </tbody>
     </table>
 </template>

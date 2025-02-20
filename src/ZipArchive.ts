@@ -39,6 +39,24 @@ export class ZipFile extends ZipEntry
         super(name, parent);
         this.data = data;
     }
+    download(): void
+    {
+        const blob = new Blob([this.data], {type: 'application/octet-stream'});
+        const url = URL.createObjectURL(blob);
+        try {
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = this.name;
+            document.body.appendChild(a);
+            try {
+                a.click();
+            } finally {
+                document.body.removeChild(a);
+            }
+        } finally {
+            URL.revokeObjectURL(url);
+        }
+    }
 }
 
 export class ZipDirectory extends ZipEntry
