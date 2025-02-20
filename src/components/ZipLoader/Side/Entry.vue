@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, onMounted } from 'vue';
-import { ZipDirectory, ZipArchive, ZipFile } from '../../ZipArchive';
-import EventBus from '../../EventBus';
+import { ZipDirectory, ZipArchive, ZipFile } from '../../../ZipArchive';
+import EventBus from '../../../EventBus';
 
 const props = defineProps<{
     zipEntry: ZipDirectory|ZipFile;
