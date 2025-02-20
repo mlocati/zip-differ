@@ -1,14 +1,11 @@
 <script setup lang="ts">
 import { computed, ref, onMounted } from 'vue';
-import { ZipDirectory, ZipArchive, ZipFile } from '../ZipArchive';
+import { ZipDirectory, ZipArchive, ZipFile } from '../../ZipArchive';
+import EventBus from '../../EventBus';
 
 const props = defineProps<{
     zipEntry: ZipDirectory|ZipFile;
 }>();
-
-const emit = defineEmits<{
-  (e: 'zipFileClicked', zipFile: ZipFile): void,
-}>()
 
 const isOpen = ref<Boolean>(false);
 const isFolder = computed<Boolean>(() => props.zipEntry instanceof ZipDirectory);
@@ -25,7 +22,7 @@ function click()
     if (props.zipEntry instanceof ZipDirectory) {
         isOpen.value = !isOpen.value;
     } else if (props.zipEntry instanceof ZipFile) {
-        emit('zipFileClicked', props.zipEntry);
+        EventBus.emit('viewZipFile', props.zipEntry);
     }
 }
 </script>
@@ -36,8 +33,8 @@ function click()
             {{ props.zipEntry instanceof ZipArchive ? props.zipEntry.zipFilename : props.zipEntry.name }}
         </a>
         <ul v-if="isFolder" v-show="isOpen">
-            <ZipViewer v-for="subdir in (<ZipDirectory>props.zipEntry).subdirs" :key="subdir.name" :zipEntry="subdir" @zipFileClicked="emit('zipFileClicked', $event)" />
-            <ZipViewer v-for="file in (<ZipDirectory>props.zipEntry).files" :key="file.name" :zipEntry="file" @zipFileClicked="emit('zipFileClicked', $event)" />
+            <Entry v-for="subdir in (<ZipDirectory>props.zipEntry).subdirs" :key="subdir.name" :zipEntry="subdir" />
+            <Entry v-for="file in (<ZipDirectory>props.zipEntry).files" :key="file.name" :zipEntry="file" />
         </ul>
     </li>
 </template>
@@ -61,16 +58,13 @@ li span.bold {
 li.folder-open, li.folder-closed {
     cursor: pointer;
 }
-li::before {
-    margin-right: 5px;
+li.folder-open>a::before {
+    content: '\229f\a0';
 }
-li.folder-open::before {
-    content: '\229f';
+li.folder-closed>a::before {
+    content: '\229e\a0';
 }
-li.folder-closed::before {
-    content: '\229e';
-}
-li.file::before {
-    content: '\00bb';
+li.file>a::before {
+    content: '\00bb\a0';
 }
 </style>

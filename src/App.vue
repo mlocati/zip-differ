@@ -2,19 +2,16 @@
 import * as bootstrap from 'bootstrap';
 import { computed, nextTick, ref } from 'vue';
 import ZipLoader from './components/ZipLoader.vue'
-import { ZipArchive, ZipFile } from './ZipArchive';
-import FileViewer from './components/FileViewer.vue';
+import { ZipArchive } from './ZipArchive';
 import { DiffArchive } from './Differ';
 import DifferViewer from './components/DifferViewer.vue';
+import ZipFileViewerDialog from './components/ZipFileViewerDialog.vue';
 
 enum Side {
   Left,
   Right,
 }
 
-const viewingZipFile = ref<ZipFile|null>(null);
-const viewingZipFileModal = ref<HTMLDivElement>();
-const viewingZipFileModalClose = ref<HTMLButtonElement>();
 const leftZipLoader = ref<typeof ZipLoader>();
 const rightZipLoader = ref<typeof ZipLoader>();
 
@@ -39,31 +36,6 @@ function zipLoaded(zip: ZipArchive|null, side: Side): void
   }
 }
 
-
-function viewZipFile(zipFile: ZipFile): void
-{
-  viewingZipFile.value = zipFile;
-  nextTick(() => {
-    if (!viewingZipFile.value) {
-      return;
-    }
-    const el = viewingZipFileModal.value;
-    if (!el) {
-      return;
-    }
-    let modal = bootstrap.Modal.getInstance(el);
-    if (!modal) {
-      modal = new bootstrap.Modal(el);
-      el.addEventListener('hidden.bs.modal', () => {
-        viewingZipFile.value = null;
-      });
-      el.addEventListener('shown.bs.modal', () => {
-        nextTick(() => viewingZipFileModalClose.value?.focus());
-      });
-    }
-    modal.show();
-  });
-}
 
 function swap(): void
 {
@@ -113,27 +85,12 @@ function compare(): void
     </div>
   </header>
   <div class="input-files">
-    <ZipLoader ref="leftZipLoader" queryStringParam="left" @zipPicked="zipLoaded($event, Side.Left)" @zipFileClicked="viewZipFile($event)" />
-    <ZipLoader ref="rightZipLoader" queryStringParam="right" @zipPicked="zipLoaded($event, Side.Right)" @zipFileClicked="viewZipFile($event)"  />
+    <ZipLoader ref="leftZipLoader" queryStringParam="left" @zipPicked="zipLoaded($event, Side.Left)" />
+    <ZipLoader ref="rightZipLoader" queryStringParam="right" @zipPicked="zipLoaded($event, Side.Right)" />
   </div>
   <div class="modals-container">
 
-    <div ref="viewingZipFileModal" class="modal" style="z-index: calc(var(--bs-modal-zindex) + 1);">
-      <div class="modal-dialog modal-xl modal-dialog-scrollable">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">{{ viewingZipFile?.name }}</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <FileViewer v-if="viewingZipFile" :zipFile="viewingZipFile" />
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-primary" data-bs-dismiss="modal" ref="viewingZipFileModalClose">Close</button>
-          </div>
-        </div>
-      </div>
-    </div>
+    <ZipFileViewerDialog  />
 
     <div ref="viewingDiffModal" class="modal">
       <div class="modal-dialog modal-fullscreen modal-dialog-scrollable">
@@ -143,7 +100,7 @@ function compare(): void
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <DifferViewer v-if="viewingDiff" :diffArchive="viewingDiff" @zipFileClicked="viewZipFile($event)" />
+            <DifferViewer v-if="viewingDiff" :diffArchive="viewingDiff" />
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
