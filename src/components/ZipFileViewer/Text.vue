@@ -19,21 +19,19 @@ const formatter = computed<Formatter|null>(() => {
 const applyFormatter = ref<Boolean>(false);
 
 const displayText = computed<string>(() => {
-    return formatter.value !== null && applyFormatter.value ? formatter.value(text.value) : text.value;
+    return formatter.value !== null && applyFormatter.value ? formatter.value.apply(text.value) : text.value;
 });
 
 const highlightJsLanguage = computed<string>(() => {
     return getHighlightJsLanguageFromFilename(props.zipFile.name);
 });
-
-
 </script>
 
 <template>
     <div v-if="formatter !== null" class="text-end">
         <label>
             <input type="checkbox" v-model="applyFormatter" />
-            Reformat
+            {{ formatter.actionName }}
         </label>
     </div>
     <div class="zip-differ">

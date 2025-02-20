@@ -35,6 +35,11 @@ defineProps<{
                 <td>{{ diffFile.left!.size.toLocaleString('en-US') }}</td>
                 <td>{{ diffFile.right!.size.toLocaleString('en-US') }}</td>
             </tr>
+            <tr>
+                <th></th>
+                <td><button class="btn btn-info" @click.prevent="diffFile.left!.download()">&#x2BAF; Download</button></td>
+                <td><button class="btn btn-info" @click.prevent="diffFile.right!.download()">&#x2BAF; Download</button></td>
+            </tr>
         </tbody>
     </table>
 </template>
