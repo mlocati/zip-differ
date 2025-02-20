@@ -77,8 +77,8 @@ const vBootstrapTooltip = {
 
 function viewDiffFile(diffFile: DiffFile): void
 {
-    window.alert(`@todo ${diffFile.name}`);
-}1
+    EventBus.emit('viewDiffFile', diffFile);
+}
 </script>
 
 <template>

@@ -2,8 +2,9 @@
 import { ref } from 'vue';
 import { DiffArchive } from './Differ';
 import DiffArchiveViewer from './components/DiffArchiveViewer.vue';
-import ZipFileViewerDialog from './components/ZipFileViewerDialog.vue';
+import ZipFileViewerModal from './components/ZipFileViewerModal.vue';
 import ZipLoader from './components/ZipLoader.vue';
+import DiffFileViewerModal from './components/DiffFileViewerModal.vue';
 
 const zipLoader = ref<typeof ZipLoader>();
 
@@ -30,7 +31,8 @@ function diffReady(diffArchive: DiffArchive): void
   <ZipLoader v-show="viewingDiff === null" ref="zipLoader" @diffReady="diffReady" />
   <DiffArchiveViewer v-if="viewingDiff !== null" :diffArchive="viewingDiff" />
   <div class="modals-container">
-    <ZipFileViewerDialog  />
+    <ZipFileViewerModal  />
+    <DiffFileViewerModal />
 </div>
 </template>
 

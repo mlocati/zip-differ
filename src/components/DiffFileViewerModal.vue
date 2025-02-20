@@ -1,53 +1,53 @@
 <script setup lang="ts">
 import { nextTick, onMounted, onUnmounted, ref } from 'vue';
-import { ZipFile } from '../ZipArchive';
+import { DiffFile } from '../Differ';
 import EventBus from '../EventBus';
 import * as bootstrap from 'bootstrap';
-import ZipFileViewer from './ZipFileViewer.vue';
+import DiffFileViewer from './DiffFileViewer.vue';
 
-const viewingZipFile = ref<ZipFile|null>(null);
-const viewingZipFileModal = ref<HTMLDivElement>();
+const diffFile = ref<DiffFile|null>(null);
+const modal = ref<HTMLDivElement>();
 
-function viewZipFile(zipFile: ZipFile): void
+function open(file: DiffFile): void
 {
-  viewingZipFile.value = zipFile;
+  diffFile.value = file;
   nextTick(() => {
-    if (!viewingZipFile.value) {
+    if (!diffFile.value) {
       return;
     }
-    const el = viewingZipFileModal.value;
+    const el = modal.value;
     if (!el) {
       return;
     }
-    let modal = bootstrap.Modal.getInstance(el);
-    if (!modal) {
-      modal = new bootstrap.Modal(el);
+    let bsModal = bootstrap.Modal.getInstance(el);
+    if (!bsModal) {
+      bsModal = new bootstrap.Modal(el);
       el.addEventListener('hidden.bs.modal', () => {
-        viewingZipFile.value = null;
+        diffFile.value = null;
       });
     }
-    modal.show();
+    bsModal.show();
   });
 }
 
 onMounted(() => {
-    EventBus.on('viewZipFile', viewZipFile);
+    EventBus.on('viewDiffFile', open);
 });
 onUnmounted(() => {
-    EventBus.off('viewZipFile', viewZipFile);
+    EventBus.off('viewDiffFile', open);
 });
 </script>
 
 <template>
-    <div ref="viewingZipFileModal" class="modal" tabindex="-1">
+    <div ref="modal" class="modal" tabindex="-1">
       <div class="modal-dialog modal-xl modal-dialog-scrollable">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">{{ viewingZipFile?.name }}</h5>
+            <h5 class="modal-title">{{ diffFile?.name }}</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <ZipFileViewer v-if="viewingZipFile" :zipFile="viewingZipFile" />
+            <DiffFileViewer v-if="diffFile" :diffFile="diffFile" />
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
