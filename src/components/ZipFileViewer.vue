@@ -2,8 +2,8 @@
 import { computed, onMounted, ref, watch } from 'vue';
 
 import { ZipFile } from '../ZipArchive';
-import { FileFormat } from '../FileFormat';
-import { getFileFormatsFromFilename } from '../FileFormat';
+import { FileFormat } from '../FileInfo';
+import { getFileFormatsFromFilename } from '../FileInfo';
 import Image from './ZipFileViewer/Image.vue';
 import Text from './ZipFileViewer/Text.vue';
 import Info from './ZipFileViewer/Info.vue';

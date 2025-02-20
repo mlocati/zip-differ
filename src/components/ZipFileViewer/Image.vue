@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import { ZipFile } from '../../ZipArchive';
-import { getMimeTypeFromFilename } from '../../FileFormat';
+import { getMimeTypeFromFilename } from '../../FileInfo';
 
 const props = defineProps<{
     zipFile: ZipFile,

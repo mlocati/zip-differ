@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { ZipFile } from '../../ZipArchive';
-import { getBeautifierFromFilename, type Beautifier } from '../../Beautifier';
-import { getHighlightJsLanguageFromFilename } from '../../FileFormat';
+import { getFormatterFromFilename, type Formatter } from '../../FileInfo';
+import { getHighlightJsLanguageFromFilename } from '../../FileInfo';
 
 const props = defineProps<{
     zipFile: ZipFile,
@@ -12,27 +12,28 @@ const text = computed<string>(() => {
     return new TextDecoder().decode(props.zipFile.data);
 });
 
-const beautifier = computed<Beautifier|null>(() => {
-    return getBeautifierFromFilename(props.zipFile.name);
+const formatter = computed<Formatter|null>(() => {
+    return getFormatterFromFilename(props.zipFile.name);
 }); 
 
+const applyFormatter = ref<Boolean>(false);
+
 const displayText = computed<string>(() => {
-    return beautifier.value !== null && beautifierApplied.value ? beautifier.value(text.value) : text.value;
+    return formatter.value !== null && applyFormatter.value ? formatter.value(text.value) : text.value;
 });
 
 const highlightJsLanguage = computed<string>(() => {
     return getHighlightJsLanguageFromFilename(props.zipFile.name);
 });
 
-const beautifierApplied = ref<Boolean>(false);
 
 </script>
 
 <template>
-    <div v-if="beautifier !== null" class="text-end">
+    <div v-if="formatter !== null" class="text-end">
         <label>
-            <input type="checkbox" v-model="beautifierApplied" />
-            Beautify
+            <input type="checkbox" v-model="applyFormatter" />
+            Reformat
         </label>
     </div>
     <div class="zip-differ">
