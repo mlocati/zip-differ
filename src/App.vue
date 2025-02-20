@@ -4,7 +4,6 @@ import { computed, nextTick, ref } from 'vue';
 import ZipLoader from './components/ZipLoader.vue'
 import { ZipArchive, ZipFile } from './ZipArchive';
 import FileViewer from './components/FileViewer.vue';
-import FileViewerActions from './components/FileViewer/Actions.vue';
 import { DiffArchive } from './Differ';
 import DifferViewer from './components/DifferViewer.vue';
 
@@ -130,7 +129,6 @@ function compare(): void
             <FileViewer v-if="viewingZipFile" :zipFile="viewingZipFile" />
           </div>
           <div class="modal-footer">
-            <FileViewerActions />
             <button type="button" class="btn btn-primary" data-bs-dismiss="modal" ref="viewingZipFileModalClose">Close</button>
           </div>
         </div>

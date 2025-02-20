@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, watch } from 'vue';
+import { computed, ref } from 'vue';
 import { ZipFile } from '../../ZipArchive';
 import { getBeautifierFromFilename, type Beautifier } from '../../Beautifier';
-import { beautifierApplied, beautifierExists } from "./Data";
 import { getHighlightJsLanguageFromFilename } from '../../FileFormat';
 
 const props = defineProps<{
@@ -25,21 +24,17 @@ const highlightJsLanguage = computed<string>(() => {
     return getHighlightJsLanguageFromFilename(props.zipFile.name);
 });
 
-watch(beautifier, (newBeautifier) => {
-    beautifierExists.value = newBeautifier !== null;
-});
+const beautifierApplied = ref<Boolean>(false);
 
-onMounted(() => {
-    beautifierExists.value = beautifier.value !== null;
-});
-
-onBeforeUnmount(() => {
-    beautifierApplied.value = false;
-    beautifierExists.value = false;
-});
 </script>
 
 <template>
+    <div v-if="beautifier !== null" class="text-end">
+        <label>
+            <input type="checkbox" v-model="beautifierApplied" />
+            Beautify
+        </label>
+    </div>
     <div class="zip-differ">
         <highlightjs :autodetect="highlightJsLanguage === ''" :language="highlightJsLanguage" :code="displayText" />
     </div>
