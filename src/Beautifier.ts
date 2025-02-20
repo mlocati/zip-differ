@@ -38,8 +38,14 @@ export function getBeautifierFromExtension(extension: string): Beautifier|null
             return beautifyCSS;
         case 'htm':
         case 'html':
+        case 'xhtml':
             return beautifyHtml;
+        case 'atom':
+        case 'rss':
+        case 'svg':
         case 'xml':
+        case 'xsd':
+        case 'xsl':
             return beautifyXML;
         default:
             return null;
