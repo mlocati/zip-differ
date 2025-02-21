@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, onMounted } from 'vue';
+import { computed, onMounted } from 'vue';
 import { InputDirectory, InputArchive, InputFile } from '../../../InputArchive';
 import EventBus from '../../../EventBus';
 
