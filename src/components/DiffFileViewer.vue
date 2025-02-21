@@ -5,6 +5,8 @@ import { getFileFormatsFromFilename } from '../FileInfo';
 import type { DiffFile } from '../Differ';
 import Info from './DiffFileViewer/Info.vue';
 import TextDiff from './DiffFileViewer/TextDiff.vue';
+import TextSideBySide from './DiffFileViewer/TextSideBySide.vue';
+import ImageSideBySide from './DiffFileViewer/ImageSideBySide.vue';
 
 const props = defineProps<{
     diffFile: DiffFile,
@@ -12,6 +14,8 @@ const props = defineProps<{
 
 enum Tabs {
     TextDiff,
+    TextSideBySide,
+    ImageSideBySide,
     Info,
 }
 
@@ -21,6 +25,10 @@ const availableTabs = computed<Tabs[]>(() => {
     const tabs = [];
     if (fileFormats.value.includes(FileFormat.Text)) {
         tabs.push(Tabs.TextDiff);
+        tabs.push(Tabs.TextSideBySide);
+    }
+    if (fileFormats.value.includes(FileFormat.Image)) {
+        tabs.push(Tabs.ImageSideBySide);
     }
     tabs.push(Tabs.Info);
     return tabs;
@@ -40,14 +48,31 @@ onMounted(() => {
 <template>
     <ul class="nav nav-tabs mb-2" v-if="availableTabs.length > 0">
         <li class="nav-item" v-if="availableTabs.includes(Tabs.TextDiff)">
-            <a class="nav-link" :class="{active: currentTab === Tabs.TextDiff}" href="#" @click.prevent="currentTab = Tabs.TextDiff">Text Changes</a>
+            <a class="nav-link" :class="{active: currentTab === Tabs.TextDiff}" href="#" @click.prevent="currentTab = Tabs.TextDiff">
+                <template v-if="fileFormats.includes(FileFormat.Image)">Text Changes</template>
+                <template v-else>Changes</template>
+            </a>
+        </li>
+        <li class="nav-item" v-if="availableTabs.includes(Tabs.TextSideBySide)">
+            <a class="nav-link" :class="{active: currentTab === Tabs.TextSideBySide}" href="#" @click.prevent="currentTab = Tabs.TextSideBySide">
+                <template v-if="fileFormats.includes(FileFormat.Image)">Text Side by Side</template>
+                <template v-else>Side by Side</template>
+            </a>
+        </li>
+        <li class="nav-item" v-if="availableTabs.includes(Tabs.ImageSideBySide)">
+            <a class="nav-link" :class="{active: currentTab === Tabs.ImageSideBySide}" href="#" @click.prevent="currentTab = Tabs.ImageSideBySide">
+                <template v-if="fileFormats.includes(FileFormat.Text)">Image Side by Side</template>
+                <template v-else>Side by Side</template>
+            </a>
         </li>
         <li class="nav-item">
             <a class="nav-link" :class="{active: currentTab === Tabs.Info}" href="#" @click.prevent="currentTab = Tabs.Info">Info</a>
         </li>
     </ul>
-    <div>
+    <div class="container-fluid">
         <TextDiff v-if="currentTab === Tabs.TextDiff" :diffFile="diffFile" />
+        <TextSideBySide v-else-if="currentTab === Tabs.TextSideBySide" :diffFile="diffFile" />
+        <ImageSideBySide v-else-if="currentTab === Tabs.ImageSideBySide" :diffFile="diffFile" />
         <Info v-else-if="currentTab === Tabs.Info" :diffFile="diffFile" />
     </div>
 </template>
