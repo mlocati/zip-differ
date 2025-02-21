@@ -1,29 +1,29 @@
 import JSZip from 'jszip'
 import { formatSize } from './Size';
 
-export abstract class ZipEntry
+export abstract class InputItem
 {
     readonly name: string;
-    readonly parent: ZipDirectory|null;
-    get zipArchive(): ZipArchive
+    readonly parent: InputDirectory|null;
+    get inputArchive(): InputArchive
     {
-        if (this instanceof ZipArchive) {
-            return <ZipArchive>this;
+        if (this instanceof InputArchive) {
+            return <InputArchive>this;
         }
-        return this.parent!.zipArchive;
+        return this.parent!.inputArchive;
     }
     get path(): string
     {
         return (this.parent?.path.replace(/\/$/, '') || '') + '/' + this.name;
     }
-    constructor(name: string, parent: ZipDirectory|null)
+    constructor(name: string, parent: InputDirectory|null)
     {
         this.name = name;
         this.parent = parent;
     }
 }
 
-export class ZipFile extends ZipEntry
+export class InputFile extends InputItem
 {    
     readonly data: Uint8Array;
     get size(): number
@@ -34,7 +34,7 @@ export class ZipFile extends ZipEntry
     {
         return formatSize(this.size);
     }
-    constructor(name: string, parent: ZipDirectory, data: Uint8Array)
+    constructor(name: string, parent: InputDirectory, data: Uint8Array)
     {
         super(name, parent);
         this.data = data;
@@ -59,12 +59,12 @@ export class ZipFile extends ZipEntry
     }
 }
 
-export class ZipDirectory extends ZipEntry
+export class InputDirectory extends InputItem
 {
-    readonly subdirs: ZipDirectory[];
-    readonly files: ZipFile[];
+    readonly subdirs: InputDirectory[];
+    readonly files: InputFile[];
 
-    constructor(name: string, parent: ZipDirectory|null)
+    constructor(name: string, parent: InputDirectory|null)
     {
         super(name, parent);
         this.subdirs = [];
@@ -74,7 +74,7 @@ export class ZipDirectory extends ZipEntry
     get totalSubdirs(): number
     {
         return this.subdirs.reduce(
-            (accumulator: number, subdir: ZipDirectory): number => accumulator + subdir.totalSubdirs,
+            (accumulator: number, subdir: InputDirectory): number => accumulator + subdir.totalSubdirs,
             this.subdirs.length
         );
     }
@@ -82,7 +82,7 @@ export class ZipDirectory extends ZipEntry
     get totalFiles(): number
     {
         return this.subdirs.reduce(
-            (accumulator: number, subdir: ZipDirectory): number => accumulator + subdir.totalFiles,
+            (accumulator: number, subdir: InputDirectory): number => accumulator + subdir.totalFiles,
             this.files.length
         );
     }
@@ -90,9 +90,9 @@ export class ZipDirectory extends ZipEntry
     get totalSize(): number
     {
         return this.subdirs.reduce(
-            (accumulator: number, subdir: ZipDirectory): number => accumulator + subdir.totalSize,
+            (accumulator: number, subdir: InputDirectory): number => accumulator + subdir.totalSize,
             this.files.reduce(
-                (accumulator: number, file: ZipFile): number => accumulator + file.data.byteLength,
+                (accumulator: number, file: InputFile): number => accumulator + file.data.byteLength,
                 0
             )
         );
@@ -103,7 +103,7 @@ export class ZipDirectory extends ZipEntry
         return formatSize(this.totalSize);
     }
 
-    getDirectoryByPath(path: string, caseSensitive: boolean = false, createIfNotFound: boolean = false): ZipDirectory|null
+    getDirectoryByPath(path: string, caseSensitive: boolean = false, createIfNotFound: boolean = false): InputDirectory|null
     {
         path = path.replace(/^\/+|\/+$/, '');
         if (path === '') {
@@ -120,13 +120,13 @@ export class ZipDirectory extends ZipEntry
             if (!createIfNotFound) {
                 return null;
             }
-            subdir = new ZipDirectory(name, this);
+            subdir = new InputDirectory(name, this);
             this.subdirs.push(subdir);
         }
         return subdir.getDirectoryByPath(chunks.slice(1).join('/'), caseSensitive, createIfNotFound);
     }
 
-    getFileByPath(path: string, caseSensitive: boolean = false): ZipFile|null
+    getFileByPath(path: string, caseSensitive: boolean = false): InputFile|null
     {
         path = path.replace(/^\/+|\/+$/, '');
         if (path === '') {
@@ -147,33 +147,33 @@ export class ZipDirectory extends ZipEntry
     }
 }
 
-export class ZipArchive extends ZipDirectory
+export class InputArchive extends InputDirectory
 {
-    readonly zipFilename: string;
+    readonly archiveFilename: string;
     readonly compressedSize: number;
     get compressedSizeFormatted(): string
     {
         return formatSize(this.compressedSize);
     }
 
-    constructor(zipFilename: string, compressedSize: number)
+    constructor(archiveFilename: string, compressedSize: number)
     {
         super('', null);
-        this.zipFilename = zipFilename;
+        this.archiveFilename = archiveFilename;
         this.compressedSize = compressedSize;
     }
 }
 
 const COLLATE = new Intl.Collator('en-US', {numeric: true, sensitivity: 'base'});
 
-function sort(dir: ZipDirectory): void
+function sort(dir: InputDirectory): void
 {
     dir.subdirs.sort((a, b) => COLLATE.compare(a.name, b.name));
     dir.files.sort((a, b) => COLLATE.compare(a.name, b.name));
     dir.subdirs.forEach((subdir) => sort(subdir));
 }
 
-async function processZipEntry(result: ZipArchive, entry: JSZip.JSZipObject): Promise<void>
+async function processZipEntry(entry: JSZip.JSZipObject, result: InputArchive): Promise<void>
 {
     const entryPath = entry.name.replace(/^\/+|\/+$/, '');
     if (entryPath === '') {
@@ -187,28 +187,28 @@ async function processZipEntry(result: ZipArchive, entry: JSZip.JSZipObject): Pr
         return;
     }
     const chunks = entryPath.split('/');
-    const dir = <ZipDirectory>result.getDirectoryByPath(chunks.slice(0, -1).join('/'), false, true);
-    dir.files.push(new ZipFile(chunks[chunks.length - 1], dir, await entry.async('uint8array')));
+    const dir = <InputDirectory>result.getDirectoryByPath(chunks.slice(0, -1).join('/'), false, true);
+    dir.files.push(new InputFile(chunks[chunks.length - 1], dir, await entry.async('uint8array')));
 }
 
-async function parseZipContents(zipFilename: string, zipCompressedSize: number, contents: JSZip): Promise<ZipArchive>
+async function parseZipContents(archiveFilename: string, zipCompressedSize: number, contents: JSZip): Promise<InputArchive>
 {
-    const result = new ZipArchive(zipFilename, zipCompressedSize);
+    const result = new InputArchive(archiveFilename, zipCompressedSize);
     for (const [_, entry] of Object.entries(contents.files)) {
-        await processZipEntry(result, entry);
+        await processZipEntry(entry, result);
     }
     sort(result);
     return result;
 }
 
-export async function readArrayByffer(zipFilename: string, buffer: ArrayBuffer): Promise<ZipArchive>
+export async function readArrayByffer(archiveFilename: string, buffer: ArrayBuffer): Promise<InputArchive>
 {
     const jszip = new JSZip();
     const contents = await jszip.loadAsync(buffer, {createFolders: true});
-    return await parseZipContents(zipFilename, buffer.byteLength, contents);
+    return await parseZipContents(archiveFilename, buffer.byteLength, contents);
 }
 
-export async function readFile(file: File): Promise<ZipArchive>
+export async function readFile(file: File): Promise<InputArchive>
 {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();

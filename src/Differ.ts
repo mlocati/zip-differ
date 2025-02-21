@@ -1,10 +1,10 @@
-import type { ZipArchive, ZipDirectory, ZipEntry, ZipFile } from "./ZipArchive";
+import type { InputArchive, InputDirectory, InputItem, InputFile } from "./InputArchive";
 
 export abstract class DiffEntry
 {
     abstract get name(): string;
-    abstract get left(): ZipEntry|null;
-    abstract get right(): ZipEntry|null;
+    abstract get left(): InputItem|null;
+    abstract get right(): InputItem|null;
     abstract get parent(): DiffDirectory|null;
     abstract get notes(): string;
     abstract get isDifferent(): boolean;
@@ -20,12 +20,12 @@ export abstract class DiffEntry
 export class DiffFile extends DiffEntry
 {
     readonly name: string;
-    readonly left: ZipFile|null;
-    readonly right: ZipFile|null;
+    readonly left: InputFile|null;
+    readonly right: InputFile|null;
     readonly parent: DiffDirectory;
     readonly isDifferent: boolean;
     readonly notes: string;
-    constructor(left: ZipFile|null, right: ZipFile|null, parent: DiffDirectory)
+    constructor(left: InputFile|null, right: InputFile|null, parent: DiffDirectory)
     {
         super();
         this.name = left?.name ?? right?.name ?? '?';
@@ -55,8 +55,8 @@ export class DiffFile extends DiffEntry
 export class DiffDirectory extends DiffEntry
 {
     readonly name: string;
-    readonly left: ZipDirectory|null;
-    readonly right: ZipDirectory|null;
+    readonly left: InputDirectory|null;
+    readonly right: InputDirectory|null;
     readonly parent: DiffDirectory|null;
     readonly subdirs: DiffDirectory[]
     readonly files: DiffFile[];
@@ -74,7 +74,7 @@ export class DiffDirectory extends DiffEntry
         return false;
     }
 
-    constructor(left: ZipDirectory|null, right: ZipDirectory|null, parent: DiffDirectory|null)
+    constructor(left: InputDirectory|null, right: InputDirectory|null, parent: DiffDirectory|null)
     {
         super();
         this.name = left?.name ?? right?.name ?? '?';
@@ -96,7 +96,7 @@ export class DiffDirectory extends DiffEntry
             }
         }
         if (left === null || right === null) {
-            const one: ZipDirectory|null = left ?? right;
+            const one: InputDirectory|null = left ?? right;
             if (one !== null) {
                 for (const subdir of one.subdirs) {
                     this.subdirs.push(new DiffDirectory(left ? subdir : null, left ? null : subdir, this));
@@ -106,8 +106,8 @@ export class DiffDirectory extends DiffEntry
                 }
             }
         } else {
-            const rightDirs: ZipDirectory[] = [];
-            left.subdirs.forEach((leftSubdir: ZipDirectory): void => {
+            const rightDirs: InputDirectory[] = [];
+            left.subdirs.forEach((leftSubdir: InputDirectory): void => {
                 const rightSubdir = right.getDirectoryByPath(leftSubdir.name);
                 if (rightSubdir === null) {
                     this.subdirs.push(new DiffDirectory(leftSubdir, null, this));
@@ -117,11 +117,11 @@ export class DiffDirectory extends DiffEntry
                 this.subdirs.push(new DiffDirectory(leftSubdir, rightSubdir, this));
             });
             right.subdirs
-                .filter((rightSubdir: ZipDirectory) => !rightDirs.includes(rightSubdir))
-                .forEach((rightSubdir: ZipDirectory) => this.subdirs.push(new DiffDirectory(null, rightSubdir, this)))
+                .filter((rightSubdir: InputDirectory) => !rightDirs.includes(rightSubdir))
+                .forEach((rightSubdir: InputDirectory) => this.subdirs.push(new DiffDirectory(null, rightSubdir, this)))
             ;
-            const rightFiles: ZipFile[] = [];
-            left.files.forEach((leftFile: ZipFile): void => {
+            const rightFiles: InputFile[] = [];
+            left.files.forEach((leftFile: InputFile): void => {
                 const rightFile = right.getFileByPath(leftFile.name);
                 if (rightFile === null) {
                     this.files.push(new DiffFile(leftFile, null, this));
@@ -131,8 +131,8 @@ export class DiffDirectory extends DiffEntry
                 this.files.push(new DiffFile(leftFile, rightFile, this));
             });
             right.files
-                .filter((rightFile: ZipFile) => !rightFiles.includes(rightFile))
-                .forEach((rightFile: ZipFile) => this.files.push(new DiffFile(null, rightFile, this)))
+                .filter((rightFile: InputFile) => !rightFiles.includes(rightFile))
+                .forEach((rightFile: InputFile) => this.files.push(new DiffFile(null, rightFile, this)))
             ;
         }
         this.notes = notes;
@@ -141,10 +141,10 @@ export class DiffDirectory extends DiffEntry
 
 export class DiffArchive extends DiffDirectory
 {
-    readonly left: ZipArchive;
-    readonly right: ZipArchive;
+    readonly left: InputArchive;
+    readonly right: InputArchive;
 
-    constructor(left: ZipArchive, right: ZipArchive)
+    constructor(left: InputArchive, right: InputArchive)
     {
         super(left, right, null);
         this.left = left;

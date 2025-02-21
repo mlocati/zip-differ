@@ -1,18 +1,18 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue';
 
-import { ZipFile } from '../ZipArchive';
+import { InputFile } from '../InputArchive';
 import { FileFormat } from '../FileInfo';
 import { getFileFormatsFromFilename } from '../FileInfo';
-import Image from './ZipFileViewer/Image.vue';
-import Text from './ZipFileViewer/Text.vue';
-import Info from './ZipFileViewer/Info.vue';
+import Image from './InputFileViewer/Image.vue';
+import Text from './InputFileViewer/Text.vue';
+import Info from './InputFileViewer/Info.vue';
 
 const props = defineProps<{
-    zipFile: ZipFile,
+    inputFile: InputFile,
 }>();
 
-const fileFormats = computed<FileFormat[]>(() => getFileFormatsFromFilename(props.zipFile.name));
+const fileFormats = computed<FileFormat[]>(() => getFileFormatsFromFilename(props.inputFile.name));
 
 const currentFormat = ref<FileFormat|null>(null);
 
@@ -38,8 +38,8 @@ onMounted(() => {
         </li>
     </ul>
     <div>
-        <Image v-if="currentFormat === FileFormat.Image" :zipFile="props.zipFile" />
-        <Text v-else-if="currentFormat === FileFormat.Text" :zipFile="props.zipFile" />
-        <Info v-else :zipFile="props.zipFile" />
+        <Image v-if="currentFormat === FileFormat.Image" :inputFile="inputFile" />
+        <Text v-else-if="currentFormat === FileFormat.Text" :inputFile="inputFile" />
+        <Info v-else :inputFile="inputFile" />
     </div>
 </template>

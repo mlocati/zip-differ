@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { DiffDirectory, DiffFile, type DiffArchive, type DiffEntry } from '../Differ';
-import { ZipFile } from '../ZipArchive';
+import { InputFile } from '../InputArchive';
 import { Tooltip } from 'bootstrap';
 import EventBus from '../EventBus';
 
@@ -99,15 +99,15 @@ function viewDiffFile(diffFile: DiffFile): void
                 <template v-for="entry in flatEntries">
                     <tr :class="getEntryClasses(entry.entry)">
                         <td class="action">
-                            <template v-if="entry.entry.left instanceof ZipFile">
-                                <a class="btn btn-sm btn-info p-0" href="#" @click.prevent="EventBus.emit('viewZipFile', <ZipFile>entry.entry.left)" v-bootstrap-tooltip title="View left file">
+                            <template v-if="entry.entry.left instanceof InputFile">
+                                <a class="btn btn-sm btn-info p-0" href="#" @click.prevent="EventBus.emit('viewInputFile', <InputFile>entry.entry.left)" v-bootstrap-tooltip title="View left file">
                                     &#x1F441;
                                 </a>
                             </template>
                         </td>
                         <td class="action">
-                            <template v-if="entry.entry.right instanceof ZipFile">
-                                <a class="btn btn-sm btn-info p-0" href="#" @click.prevent="EventBus.emit('viewZipFile', <ZipFile>entry.entry.right)" v-bootstrap-tooltip title="View right file">
+                            <template v-if="entry.entry.right instanceof InputFile">
+                                <a class="btn btn-sm btn-info p-0" href="#" @click.prevent="EventBus.emit('viewInputFile', <InputFile>entry.entry.right)" v-bootstrap-tooltip title="View right file">
                                     &#x1F441;
                                 </a>
                             </template>

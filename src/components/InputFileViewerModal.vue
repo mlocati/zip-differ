@@ -1,18 +1,18 @@
 <script setup lang="ts">
 import { nextTick, onMounted, onUnmounted, ref } from 'vue';
-import { ZipFile } from '../ZipArchive';
+import { InputFile } from '../InputArchive';
 import EventBus from '../EventBus';
 import * as bootstrap from 'bootstrap';
-import ZipFileViewer from './ZipFileViewer.vue';
+import InputFileViewer from './InputFileViewer.vue';
 
-const zipFile = ref<ZipFile|null>(null);
+const inputFile = ref<InputFile|null>(null);
 const modal = ref<HTMLDivElement>();
 
-function open(file: ZipFile): void
+function open(file: InputFile): void
 {
-  zipFile.value = file;
+  inputFile.value = file;
   nextTick(() => {
-    if (!zipFile.value) {
+    if (!inputFile.value) {
       return;
     }
     const el = modal.value;
@@ -23,7 +23,7 @@ function open(file: ZipFile): void
     if (!bsModal) {
       bsModal = new bootstrap.Modal(el);
       el.addEventListener('hidden.bs.modal', () => {
-        zipFile.value = null;
+        inputFile.value = null;
       });
     }
     bsModal.show();
@@ -31,10 +31,10 @@ function open(file: ZipFile): void
 }
 
 onMounted(() => {
-    EventBus.on('viewZipFile', open);
+    EventBus.on('viewInputFile', open);
 });
 onUnmounted(() => {
-    EventBus.off('viewZipFile', open);
+    EventBus.off('viewInputFile', open);
 });
 </script>
 
@@ -43,11 +43,11 @@ onUnmounted(() => {
       <div class="modal-dialog modal-xl modal-dialog-scrollable">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">{{ zipFile?.name }}</h5>
+            <h5 class="modal-title">{{ inputFile?.name }}</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <ZipFileViewer v-if="zipFile" :zipFile="zipFile" />
+            <InputFileViewer v-if="inputFile" :inputFile="inputFile" />
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>

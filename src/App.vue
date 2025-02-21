@@ -2,11 +2,11 @@
 import { ref } from 'vue';
 import { DiffArchive } from './Differ';
 import DiffArchiveViewer from './components/DiffArchiveViewer.vue';
-import ZipFileViewerModal from './components/ZipFileViewerModal.vue';
-import ZipLoader from './components/ZipLoader.vue';
+import InputFileViewerModal from './components/InputFileViewerModal.vue';
+import InputLoader from './components/InputLoader.vue';
 import DiffFileViewerModal from './components/DiffFileViewerModal.vue';
 
-const zipLoader = ref<typeof ZipLoader>();
+const inputLoader = ref<typeof InputLoader>();
 
 const viewingDiff = ref<DiffArchive|null>(null);
 
@@ -23,15 +23,15 @@ function diffReady(diffArchive: DiffArchive): void
     <div v-if="viewingDiff !== null">
       <button class="btn btn-primary" @click.prevent="viewingDiff = null">Close</button>
     </div>
-    <div v-else-if="zipLoader">
-      <button class="btn btn-info me-2" @click.prevent="zipLoader.swap()" :disabled="!zipLoader.canSwap">Swap</button>
-      <button class="btn btn-primary" @click.prevent="zipLoader.compare()" :disabled="!zipLoader.canCompare">Compare</button>
+    <div v-else-if="inputLoader">
+      <button class="btn btn-info me-2" @click.prevent="inputLoader.swap()" :disabled="!inputLoader.canSwap">Swap</button>
+      <button class="btn btn-primary" @click.prevent="inputLoader.compare()" :disabled="!inputLoader.canCompare">Compare</button>
     </div>
   </header>
-  <ZipLoader v-show="viewingDiff === null" ref="zipLoader" @diffReady="diffReady" />
+  <InputLoader v-show="viewingDiff === null" ref="inputLoader" @diffReady="diffReady" />
   <DiffArchiveViewer v-if="viewingDiff !== null" :diffArchive="viewingDiff" />
   <div class="modals-container">
-    <ZipFileViewerModal  />
+    <InputFileViewerModal  />
     <DiffFileViewerModal />
 </div>
 </template>

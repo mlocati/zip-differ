@@ -12,8 +12,8 @@ defineProps<{
         <tbody>
             <tr>
                 <th>Archive</th>
-                <td><code>{{ diffFile.left!.zipArchive.zipFilename }}</code></td>
-                <td><code>{{ diffFile.right!.zipArchive.zipFilename }}</code></td>
+                <td><code>{{ diffFile.left!.inputArchive.archiveFilename }}</code></td>
+                <td><code>{{ diffFile.right!.inputArchive.archiveFilename }}</code></td>
             </tr>
             <tr>
                 <th>Name</th>

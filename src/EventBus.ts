@@ -1,9 +1,9 @@
 import mitt from 'mitt';
-import type { ZipFile } from './ZipArchive';
+import type { InputFile } from './InputArchive';
 import type { DiffFile } from './Differ';
 
 type Events = {
-    viewZipFile: ZipFile,
+    viewInputFile: InputFile,
     viewDiffFile: DiffFile,
 };
 

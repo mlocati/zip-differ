@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue';
-import { readFile, readArrayByffer, ZipArchive, ZipFile } from '../../ZipArchive';
+import { readFile, readArrayByffer, InputArchive } from '../../InputArchive';
 import Entry from './Side/Entry.vue';
 
 const dropArea = ref<HTMLElement>();
 const fileInput = ref<HTMLInputElement>();
 const busyMessage = ref<String>('');
 const busy = computed<Boolean>(() => busyMessage.value.length !== 0);
-const zipArchive = ref<ZipArchive|null>(null);
+const inputArchive = ref<InputArchive|null>(null);
 
 const props = defineProps({
     queryStringParam: {
@@ -18,12 +18,11 @@ const props = defineProps({
 });
 
 const emit = defineEmits<{
-  (e: 'zipPicked', zipArchive: ZipArchive|null): void,
-  (e: 'zipFileClicked', zipFile: ZipFile): void,
+  (e: 'inputArchiveLoaded', inputArchive: InputArchive|null): void,
 }>()
 
-watch(zipArchive, (zip) => {
-    emit('zipPicked', zip);
+watch(inputArchive, (archive) => {
+    emit('inputArchiveLoaded', archive);
 });
 
 async function processFile(file: File) {
@@ -36,9 +35,9 @@ async function processFile(file: File) {
         window.alert('The file is empty');
         return;
     }
-    busyMessage.value = 'Unzipping...';
+    busyMessage.value = 'Decompressing...';
     try {
-        zipArchive.value = await readFile(file);
+        inputArchive.value = await readFile(file);
     } catch (e: Error|any) {
         window.alert(e?.message || e?.toString() || 'Unknown error');
         return;
@@ -49,7 +48,7 @@ async function processFile(file: File) {
 
 function clear()
 {
-    zipArchive.value = null;
+    inputArchive.value = null;
 }
 
 async function askUrl()
@@ -77,7 +76,7 @@ async function askUrl()
 
 async function loadFromURL(urlString: string): Promise<boolean>
 {
-    let zip: ZipArchive;
+    let archive: InputArchive;
     busyMessage.value = `Downloading ${urlString}...`;
     try {
         const url = new URL(urlString);
@@ -100,8 +99,8 @@ async function loadFromURL(urlString: string): Promise<boolean>
                 filename = match[2];
             }
         }
-        busyMessage.value = `Unzipping ${filename}...`;
-        zip = await readArrayByffer(filename, arrayBuffer);
+        busyMessage.value = `Decompressing ${filename}...`;
+        archive = await readArrayByffer(filename, arrayBuffer);
     }
     catch (e: Error|any) {
         window.alert(e?.message || e?.toString() || 'Unknown error');
@@ -109,17 +108,17 @@ async function loadFromURL(urlString: string): Promise<boolean>
     } finally {
         busyMessage.value = '';
     }
-    zipArchive.value = zip;
+    inputArchive.value = archive;
     return true;
 }
 
-function setZipArchive(zip: ZipArchive|null)
+function setInputArchive(zip: InputArchive|null)
 {
-    zipArchive.value = zip;
+    inputArchive.value = zip;
 }
 
 defineExpose({
-    setZipArchive,
+    setInputArchive,
 });
 
 onMounted(() => {
@@ -166,7 +165,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <aside ref="dropArea" :class="{busy, loaded: zipArchive !== null}">
+    <aside ref="dropArea" :class="{busy, loaded: inputArchive !== null}">
         <nav class="navbar navbar-expand-sm bg-body-tertiary">
             <div class="container-fluid">
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -179,7 +178,7 @@ onMounted(() => {
                             <a class="nav-link" href="#" :class="{disabled: busy}" @click.prevent.stop="askUrl()">&#127760; Open URL</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#" :class="{disabled: busy || zipArchive === null}" @click.prevent.stop="clear()"><span class="text-danger">&#128473;</span> Clear</a>
+                            <a class="nav-link" href="#" :class="{disabled: busy || inputArchive === null}" @click.prevent.stop="clear()"><span class="text-danger">&#128473;</span> Clear</a>
                         </li>
                     </ul>
                 </div>
@@ -188,19 +187,19 @@ onMounted(() => {
         <main v-if="busy" class="message">
             {{ busyMessage }}
         </main>
-        <main v-else-if="zipArchive === null" class="message">
+        <main v-else-if="inputArchive === null" class="message">
             Open a file, or drop it here.
         </main>
         <main v-else class="contents">
             <ul>
-                <Entry :zipEntry="zipArchive" />
+                <Entry :inputItem="inputArchive" />
             </ul>
             <div>
             </div>
         </main>
-        <footer v-if="!busy && zipArchive !== null">
-            Total size: <span :title="`${zipArchive.totalSize} bytes`">{{  zipArchive.totalSizeFormatted }}</span>
-            Compressed size: <span :title="`${zipArchive.compressedSize} bytes`">{{ zipArchive.compressedSizeFormatted }}</span>
+        <footer v-if="!busy && inputArchive !== null">
+            Total size: <span :title="`${inputArchive.totalSize} bytes`">{{  inputArchive.totalSizeFormatted }}</span>
+            Compressed size: <span :title="`${inputArchive.compressedSize} bytes`">{{ inputArchive.compressedSizeFormatted }}</span>
         </footer>
     </aside>
 </template>

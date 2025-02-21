@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ZipFile } from '../../ZipArchive';
+import { InputFile } from '../../InputArchive';
 import { formatSize } from '../../Size';
 
 defineProps<{
-    zipFile: ZipFile,
+    inputFile: InputFile,
 }>();
 
 </script>
@@ -13,27 +13,27 @@ defineProps<{
         <tbody>
             <tr>
                 <th>Archive</th>
-                <td><code>{{ zipFile.zipArchive.zipFilename }}</code></td>
+                <td><code>{{ inputFile.inputArchive.archiveFilename }}</code></td>
             </tr>
             <tr>
                 <th>Name</th>
-                <td><code>{{ zipFile.name }}</code></td>
+                <td><code>{{ inputFile.name }}</code></td>
             </tr>
             <tr>
                 <th>Full Path</th>
-                <td><code>{{ zipFile.path }}</code></td>
+                <td><code>{{ inputFile.path }}</code></td>
             </tr>
             <tr>
                 <th>Size</th>
-                <td>{{ formatSize(zipFile.size) }}</td>
+                <td>{{ formatSize(inputFile.size) }}</td>
             </tr>
             <tr>
                 <th>Size (in bytes)</th>
-                <td>{{ zipFile.size.toLocaleString('en-US') }}</td>
+                <td>{{ inputFile.size.toLocaleString('en-US') }}</td>
             </tr>
             <tr>
                 <th></th>
-                <td><button class="btn btn-info" @click.prevent="zipFile.download()">&#x2BAF; Download</button></td>
+                <td><button class="btn btn-info" @click.prevent="inputFile.download()">&#x2BAF; Download</button></td>
             </tr>
         </tbody>
     </table>

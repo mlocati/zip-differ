@@ -1,19 +1,19 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { ZipFile } from '../../ZipArchive';
+import { InputFile } from '../../InputArchive';
 import { getFormatterFromFilename, type Formatter } from '../../FileInfo';
 import { getHighlightJsLanguageFromFilename } from '../../FileInfo';
 
 const props = defineProps<{
-    zipFile: ZipFile,
+    inputFile: InputFile,
 }>();
 
 const text = computed<string>(() => {
-    return new TextDecoder().decode(props.zipFile.data);
+    return new TextDecoder().decode(props.inputFile.data);
 });
 
 const formatter = computed<Formatter|null>(() => {
-    return getFormatterFromFilename(props.zipFile.name);
+    return getFormatterFromFilename(props.inputFile.name);
 }); 
 
 const applyFormatter = ref<Boolean>(false);
@@ -23,7 +23,7 @@ const displayText = computed<string>(() => {
 });
 
 const highlightJsLanguage = computed<string>(() => {
-    return getHighlightJsLanguageFromFilename(props.zipFile.name);
+    return getHighlightJsLanguageFromFilename(props.inputFile.name);
 });
 </script>
 

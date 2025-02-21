@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import { ZipFile } from '../../ZipArchive';
+import { InputFile } from '../../InputArchive';
 import { getMimeTypeFromFilename } from '../../FileInfo';
 
 const props = defineProps<{
-    zipFile: ZipFile,
+    inputFile: InputFile,
 }>();
 
 const img = ref<HTMLImageElement>();
@@ -16,7 +16,7 @@ async function loadImage(): Promise<void>
 {
     return new Promise<void>((resolve, reject) => {
         loadError.value = '';
-        const mimeType = getMimeTypeFromFilename(props.zipFile.name);
+        const mimeType = getMimeTypeFromFilename(props.inputFile.name);
         if (mimeType === '') {
             reject('Unknown image file type');
             return;
@@ -25,7 +25,7 @@ async function loadImage(): Promise<void>
             if (!img.value) {
                 throw new Error('Image element not found');
             }
-            const blob = new Blob([props.zipFile.data], {type: mimeType});
+            const blob = new Blob([props.inputFile.data], {type: mimeType});
             const imageUrl = URL.createObjectURL(blob);
             const memoryImage = document.createElement('img');
             memoryImage.onload = () => {
