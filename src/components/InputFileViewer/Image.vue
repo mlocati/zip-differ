@@ -52,7 +52,7 @@ onUnmounted(() => {
                 <label class="form-check-label" :for="`zd-td-checkerboard-background-${uniqueID}`">Checkerboard background</label>
             </div>
         </div>
-        <div class="img" :class="checkerboardBackground ? 'checkerboard' : ''">
+        <div class="img" :class="checkerboardBackground ? 'zipdiffer-checkerboard' : ''">
             <img :src="imageSrc"/>
         </div>
     </div>
@@ -64,11 +64,5 @@ onUnmounted(() => {
     border: 0.0625rem solid #3d444d;
     border-radius: 0.375rem !important;
     overflow: hidden;
-}
-.img.checkerboard {
-    background-position: 0px 0px, 10px 10px;
-    background-repeat: repeat;
-    background-size: 20px 20px;
-    background-image: linear-gradient(45deg, #eee 25%, transparent 25%, transparent 75%, #eee 75%, #eee 100%), linear-gradient(45deg, #eee 25%, white 25%, white 75%, #eee 75%, #eee 100%);
 }
 </style>

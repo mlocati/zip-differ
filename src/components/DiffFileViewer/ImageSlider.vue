@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import type { DiffFile } from '../../Differ';
-import {ref, nextTick, onMounted, onUnmounted, useId, watch} from 'vue';
+import {computed, ref, nextTick, onMounted, onUnmounted, useId, watch} from 'vue';
 import { buildImageUrlFromData } from '../../FileInfo';
 import ImageCompare from 'image-compare-viewer';
 
 const uniqueID = useId();
-
-const counter = ref<number>(0);
 
 const props = defineProps<{
     diffFile: DiffFile,
@@ -16,6 +14,7 @@ const leftSrc = ref<string>('');
 const rightSrc = ref<string>('');
 const loadError = ref<string>('');
 const images = ref<HTMLElement|null>(null);
+const checkerboardBackground = ref<boolean>(true);
 
 watch(props.diffFile, () => loadImages());
 
@@ -43,18 +42,33 @@ async function loadImages(): Promise<void>
         loadError.value = e?.message || e?.toString() || 'Unknown error';
         return;
     }
-    counter.value++;
-    nextTick(() => {
-        createSlider();
-    });
 }
+
+const imagesHtml = computed<string>(() => {
+    if (!leftSrc.value || !rightSrc.value) {
+        return '';
+    }
+    let img = document.createElement('img');
+    img.src = leftSrc.value;
+    const container = document.createElement('div');
+    container.appendChild(img);
+    img = document.createElement('img');
+    img.src = rightSrc.value;
+    container.appendChild(img);
+    nextTick(() => createSlider());
+    return container.outerHTML;
+});
+
+let currentSliderElement: HTMLElement|null = null;
 
 function createSlider(): void
 {
-    if (!images.value) {
+    const el = images.value?.firstElementChild;
+    if (el instanceof HTMLElement === false || currentSliderElement === el) {
         return;
     }
-    new ImageCompare(images.value, {
+    currentSliderElement = el;
+    new ImageCompare(el, {
         controlColor: 'red',
         addCircle: true,
         addCircleBlur: false,
@@ -78,9 +92,12 @@ onUnmounted(() => {
         Failed to load files: {{ loadError }}
     </div>
     <div v-else-if="leftSrc && rightSrc">
-        <div ref="images" :key="`${uniqueID}-${counter}`">
-            <img :src="leftSrc" />
-            <img :src="rightSrc" />
+        <div class="text-end">
+            <div class="form-check form-check-inline form-switch">
+                <input class="form-check-input" type="checkbox" role="switch" :id="`zd-td-slider-checkerboard-background-${uniqueID}`" v-model="checkerboardBackground" />
+                <label class="form-check-label" :for="`zd-td-slider-checkerboard-background-${uniqueID}`">Checkerboard background</label>
+            </div>
         </div>
+        <div ref="images" :class="checkerboardBackground ? 'zipdiffer-checkerboard' : ''" v-html="imagesHtml"></div>
     </div>
 </template>
