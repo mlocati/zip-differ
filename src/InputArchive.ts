@@ -12,7 +12,6 @@ function download(filename: string, data: ArrayBuffer): void
 {
     const blob = new Blob([data], {type: 'application/octet-stream'});
     const url = URL.createObjectURL(blob);
-
     try {
         const a = document.createElement('a');
         a.href = url;

@@ -7,6 +7,7 @@ import Info from './DiffFileViewer/Info.vue';
 import TextDiff from './DiffFileViewer/TextDiff.vue';
 import TextSideBySide from './DiffFileViewer/TextSideBySide.vue';
 import ImageSideBySide from './DiffFileViewer/ImageSideBySide.vue';
+import ImageSlider from './DiffFileViewer/ImageSlider.vue';
 
 const props = defineProps<{
     diffFile: DiffFile,
@@ -16,6 +17,7 @@ enum Tabs {
     TextDiff,
     TextSideBySide,
     ImageSideBySide,
+    ImageSlider,
     Info,
 }
 
@@ -29,6 +31,7 @@ const availableTabs = computed<Tabs[]>(() => {
     }
     if (fileFormats.value.includes(FileFormat.Image)) {
         tabs.push(Tabs.ImageSideBySide);
+        tabs.push(Tabs.ImageSlider);
     }
     tabs.push(Tabs.Info);
     return tabs;
@@ -65,6 +68,11 @@ onMounted(() => {
                 <template v-else>Side by Side</template>
             </a>
         </li>
+        <li class="nav-item" v-if="availableTabs.includes(Tabs.ImageSlider)">
+            <a class="nav-link" :class="{active: currentTab === Tabs.ImageSlider}" href="#" @click.prevent="currentTab = Tabs.ImageSlider">
+                Slider
+            </a>
+        </li>
         <li class="nav-item">
             <a class="nav-link" :class="{active: currentTab === Tabs.Info}" href="#" @click.prevent="currentTab = Tabs.Info">Info</a>
         </li>
@@ -73,6 +81,7 @@ onMounted(() => {
         <TextDiff v-if="currentTab === Tabs.TextDiff" :diffFile="diffFile" />
         <TextSideBySide v-else-if="currentTab === Tabs.TextSideBySide" :diffFile="diffFile" />
         <ImageSideBySide v-else-if="currentTab === Tabs.ImageSideBySide" :diffFile="diffFile" />
+        <ImageSlider v-else-if="currentTab === Tabs.ImageSlider" :diffFile="diffFile" />
         <Info v-else-if="currentTab === Tabs.Info" :diffFile="diffFile" />
     </div>
 </template>

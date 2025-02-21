@@ -459,3 +459,38 @@ export function getDiffersFromFilename(filename: string): NonEmptyArray<Differ>|
 {
     return getDiffersFromExtension(extractExtensionFromFilename(filename));
 }
+
+/**
+ * Remember to invoke URL.revokeObjectURL(...) when the image is no longer needed
+ */
+export async function buildImageUrlFromData(data: ArrayBuffer, options: {filename:string}|{extension: string}|{mimetype:string}): Promise<string>
+{
+    return new Promise<string>((resolve, reject) => {
+        let mimeType: string;
+        if ('mimetype' in options) {
+            mimeType = options.mimetype;
+        } else if ('extension' in options) {
+            mimeType = getMimeTypeFromExtension(options.extension);
+        } else {
+            mimeType = getMimeTypeFromFilename(options.filename);
+        }
+        if (mimeType === '') {
+            reject('Unknown image file type');
+            return;
+        }
+        const blob = new Blob([data], {type: mimeType});
+        const url = URL.createObjectURL(blob);
+        const img = document.createElement('img');
+        img.onload = () => {
+            document.body.removeChild(img);
+            resolve(url);
+        };
+        img.onerror = () => {
+            document.body.removeChild(img);
+            URL.revokeObjectURL(url);
+            reject('Failed to load image');
+        };
+        document.body.appendChild(img);
+        img.src = url;
+    });
+}
