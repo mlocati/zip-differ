@@ -45,7 +45,7 @@ onUnmounted(() => {
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body" v-if="inputArchive">
-            <table class="table table-hover">
+            <table class="table table-hover table-borderless m-auto w-auto">
               <tbody>
                 <tr>
                   <th>Origin</th>
@@ -79,11 +79,11 @@ onUnmounted(() => {
                   <th>Uncompressed size (in bytes)</th>
                   <td>{{  inputArchive.totalSize.toLocaleString('en-US') }}</td>
                 </tr>
-                <tr>
-                  <td colspan="2" class="text-center"><button class="btn btn-info" @click.prevent="inputArchive.download()">&#x2BAF; Download</button></td>
-                </tr>
               </tbody>
             </table>
+            <div class="text-center">
+              <button class="btn btn-info" @click.prevent="inputArchive.download()">&#x2BAF; Download</button>
+            </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>

@@ -10,7 +10,7 @@ defineProps<{
 </script>
 
 <template>
-    <table class="table table-bordered w-auto">
+    <table class="table table-hover table-borderless m-auto w-auto">
         <tbody>
             <tr>
                 <th>Archive</th>
@@ -24,7 +24,7 @@ defineProps<{
                 <td><code>{{ inputFile.name }}</code></td>
             </tr>
             <tr>
-                <th>Full Path</th>
+                <th>Path in Archive</th>
                 <td><code>{{ inputFile.path }}</code></td>
             </tr>
             <tr>
@@ -35,10 +35,9 @@ defineProps<{
                 <th>Size (in bytes)</th>
                 <td>{{ inputFile.size.toLocaleString('en-US') }}</td>
             </tr>
-            <tr>
-                <th></th>
-                <td><button class="btn btn-info" @click.prevent="inputFile.download()">&#x2BAF; Download</button></td>
-            </tr>
         </tbody>
     </table>
+    <div class="text-center">
+        <button class="btn btn-info" @click.prevent="inputFile.download()">&#x2BAF; Download</button>
+    </div>
 </template>

@@ -9,7 +9,7 @@ defineProps<{
 </script>
 
 <template>
-    <table class="table table-bordered w-auto">
+    <table class="table table-hover table-borderless m-auto w-auto">
         <tbody>
             <tr>
                 <th>Archive</th>
