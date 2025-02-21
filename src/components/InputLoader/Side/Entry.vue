@@ -13,7 +13,6 @@ onMounted(() => {
     if (props.inputItem instanceof InputDirectory && props.inputItem.tags.isOpen === undefined) {
         props.inputItem.tags.isOpen = props.inputItem.parent === null || props.inputItem.parent.parent === null;
     }
-    
 });
 
 function click()

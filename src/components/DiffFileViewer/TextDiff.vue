@@ -96,8 +96,8 @@ watch(differs, (newDiffers: Differ[]) => {
 <style lang="css" scoped>
 .diff
 {
- 	border: 0.0625rem solid #3d444d;
-	border-radius: 0.375rem !important;
+    border: 0.0625rem solid #3d444d;
+    border-radius: 0.375rem !important;
 }
 .diff > pre
 {

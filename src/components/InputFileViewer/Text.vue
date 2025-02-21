@@ -16,7 +16,7 @@ const text = computed<string>(() => {
 
 const formatter = computed<Formatter|null>(() => {
     return getFormatterFromFilename(props.inputFile.name);
-}); 
+});
 
 const applyFormatter = ref<Boolean>(false);
 
@@ -43,8 +43,8 @@ const highlightJsLanguage = computed<string>(() => {
 <style lang="css" scoped>
 .zip-differ
 {
- 	border: 0.0625rem solid #3d444d;
-	border-radius: 0.375rem !important;
+    border: 0.0625rem solid #3d444d;
+    border-radius: 0.375rem !important;
 }
 .zip-differ > pre
 {
