@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, useId } from 'vue';
 import { DiffDirectory, DiffFile, type DiffArchive, type DiffEntry } from '../Differ';
 import { InputFile } from '../InputArchive';
 import { Tooltip } from 'bootstrap';
 import EventBus from '../EventBus';
+
+const uniqueID = useId();
 
 const props = defineProps<{
     diffArchive: DiffArchive,
@@ -83,11 +85,12 @@ function viewDiffFile(diffFile: DiffFile): void
 
 <template>
     <section class="container-fluid">
+
         <div class="text-end">
-            <label>
-                <input type="checkbox" v-model="showUnchanged">
-                Show unchanged
-            </label>
+            <div class="form-check form-check-inline form-switch">
+                <input class="form-check-input" type="checkbox" role="switch" :id="`zd-td-show-unchanged-${uniqueID}`" v-model="showUnchanged" />
+                <label class="form-check-label" :for="`zd-td-show-unchanged-${uniqueID}`">Show unchanged files</label>
+            </div>
         </div>
         <table class="table table-sm table-hover">
             <colgroup>
