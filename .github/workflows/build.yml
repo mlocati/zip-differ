@@ -10,6 +10,11 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
 jobs:
   build:
     name: Build
@@ -52,3 +57,18 @@ jobs:
           git add --all docs
           git commit -m 'Update docs'
           git push
+      -
+        name: Setup Pages
+        if: steps.check-changes.outputs.commit == 'yes'
+        uses: actions/configure-pages@v5
+      -
+        name: Upload artifact
+        if: steps.check-changes.outputs.commit == 'yes'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
+      -
+        name: Deploy to GitHub Pages
+        if: steps.check-changes.outputs.commit == 'yes'
+        id: deployment
+        uses: actions/deploy-pages@v4
