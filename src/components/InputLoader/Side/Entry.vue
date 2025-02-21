@@ -55,6 +55,9 @@ li a:hover {
 li span.bold {
     font-weight: bold;
 }
+li.archive>a, li.file>a {
+    cursor: help;
+}
 li.archive>a::before {
     content: '\1f4e6\a0';
 }
