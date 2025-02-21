@@ -4,7 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "predev": "node ./bin/create-samples.js",
     "dev": "vite",
+    "prebuild": "node ./bin/create-samples.js",
     "build": "vue-tsc -b && vite build",
     "preview": "vite preview"
   },

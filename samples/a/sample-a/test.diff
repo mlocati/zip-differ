@@ -1,0 +1,62 @@
+ src/components/DiffFileViewer.vue          | 7 +++++++
+ src/components/DiffFileViewer/TextDiff.vue | 2 +-
+ 2 files changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/src/components/DiffFileViewer.vue b/src/components/DiffFileViewer.vue
+index 1b11e6a..dcbe810 100644
+--- a/src/components/DiffFileViewer.vue
++++ b/src/components/DiffFileViewer.vue
+@@ -5,6 +5,7 @@ import { getFileFormatsFromFilename } from '../FileInfo';
+ import type { DiffFile } from '../Differ';
+ import Info from './DiffFileViewer/Info.vue';
+ import TextDiff from './DiffFileViewer/TextDiff.vue';
++import TextSideBySide from './DiffFileViewer/TextSideBySide.vue';
+ 
+ const props = defineProps<{
+     diffFile: DiffFile,
+@@ -12,6 +13,7 @@ const props = defineProps<{
+ 
+ enum Tabs {
+     TextDiff,
++    TextSideBySide,
+     Info,
+ }
+ 
+@@ -21,6 +23,7 @@ const availableTabs = computed<Tabs[]>(() => {
+     const tabs = [];
+     if (fileFormats.value.includes(FileFormat.Text)) {
+         tabs.push(Tabs.TextDiff);
++        tabs.push(Tabs.TextSideBySide);
+     }
+     tabs.push(Tabs.Info);
+     return tabs;
+@@ -42,12 +45,16 @@ onMounted(() => {
+         <li class="nav-item" v-if="availableTabs.includes(Tabs.TextDiff)">
+             <a class="nav-link" :class="{active: currentTab === Tabs.TextDiff}" href="#" @click.prevent="currentTab = Tabs.TextDiff">Text Changes</a>
+         </li>
++        <li class="nav-item" v-if="availableTabs.includes(Tabs.TextSideBySide)">
++            <a class="nav-link" :class="{active: currentTab === Tabs.TextSideBySide}" href="#" @click.prevent="currentTab = Tabs.TextSideBySide">Side by Side</a>
++        </li>
+         <li class="nav-item">
+             <a class="nav-link" :class="{active: currentTab === Tabs.Info}" href="#" @click.prevent="currentTab = Tabs.Info">Info</a>
+         </li>
+     </ul>
+     <div>
+         <TextDiff v-if="currentTab === Tabs.TextDiff" :diffFile="diffFile" />
++        <TextSideBySide v-else-if="currentTab === Tabs.TextSideBySide" :diffFile="diffFile" />
+         <Info v-else-if="currentTab === Tabs.Info" :diffFile="diffFile" />
+     </div>
+ </template>
+diff --git a/src/components/DiffFileViewer/TextDiff.vue b/src/components/DiffFileViewer/TextDiff.vue
+index e7e8f25..c6d2826 100644
+--- a/src/components/DiffFileViewer/TextDiff.vue
++++ b/src/components/DiffFileViewer/TextDiff.vue
+@@ -76,7 +76,7 @@ watch(differs, (newDiffers: Differ[]) => {
+         </div>
+     </div>
+     <div v-if="!differencesDetected" class="alert alert-success">No differences detected</div>
+-    <div v-else class="diff text-muted" v-html="diffHtml"></div>
++    <div v-else class="diff hljs" v-html="diffHtml"></div>
+ </template>
+ 
+ <style lang="css">
