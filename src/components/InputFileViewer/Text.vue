@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, useId } from 'vue';
 import { InputFile } from '../../InputArchive';
 import { getFormatterFromFilename, type Formatter } from '../../FileInfo';
 import { getHighlightJsLanguageFromFilename } from '../../FileInfo';
+
+const uniqueID = useId();
 
 const props = defineProps<{
     inputFile: InputFile,
@@ -29,10 +31,10 @@ const highlightJsLanguage = computed<string>(() => {
 
 <template>
     <div v-if="formatter !== null" class="text-end">
-        <label>
-            <input type="checkbox" v-model="applyFormatter" />
-            {{ formatter.actionName }}
-        </label>
+        <div class="form-check form-check-inline form-switch">
+            <input class="form-check-input" type="checkbox" role="switch" :id="`zd-td-apply-formatter-${uniqueID}`" v-model="applyFormatter" />
+            <label class="form-check-label" :for="`zd-td-apply-formatter-${uniqueID}`">{{ formatter.actionName }}</label>
+        </div>
     </div>
     <div class="zip-differ">
         <highlightjs :autodetect="highlightJsLanguage === ''" :language="highlightJsLanguage" :code="displayText" />
