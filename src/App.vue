@@ -19,7 +19,7 @@ function diffReady(diffArchive: DiffArchive): void
 
 <template>
   <header>
-    <h1>Zip Differ</h1>
+    <h1><a href="https://github.com/mlocati/zip-differ">Zip Differ</a></h1>
     <div v-if="viewingDiff !== null">
       <button class="btn btn-primary" @click.prevent="viewingDiff = null">Close</button>
     </div>
@@ -42,5 +42,9 @@ header {
   justify-content: space-between;
   align-items: center;
   padding: 0 10px;
+}
+header h1 a {
+  color: inherit;
+  text-decoration: none;
 }
 </style>
