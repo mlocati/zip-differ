@@ -79,7 +79,7 @@ async function loadFromURL(urlString: string): Promise<boolean>
     let archive: InputArchive;
     busyMessage.value = `Downloading ${urlString}...`;
     try {
-        const url = new URL(urlString);
+        const url = new URL(urlString, window.location.href);
         if (!['http:', 'https:'].includes(url.protocol)) {
             throw new Error('Only HTTP and HTTPS URLs are supported');
         }
