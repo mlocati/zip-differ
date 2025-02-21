@@ -80,8 +80,7 @@ onUnmounted(() => {
                   <td>{{  inputArchive.totalSize.toLocaleString('en-US') }}</td>
                 </tr>
                 <tr>
-                  <th></th>
-                  <td><button class="btn btn-info" @click.prevent="inputArchive.download()">&#x2BAF; Download</button></td>
+                  <td colspan="2" class="text-center"><button class="btn btn-info" @click.prevent="inputArchive.download()">&#x2BAF; Download</button></td>
                 </tr>
               </tbody>
             </table>
