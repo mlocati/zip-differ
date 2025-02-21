@@ -46,9 +46,9 @@ const diffHtml = computed<string>(() => {
             .replace(/"/g, '&quot;')
         ;
         if (change.added) {
-            chunks.push(`<ins class="diff">${html}</ins>`);
+            chunks.push(`<span class="hljs-addition">${html}</span>`);
         } else if (change.removed) {
-            chunks.push(`<del class="diff">${html}</del>`);
+            chunks.push(`<span class="hljs-deletion">${html}</span>`);
         } else {
             chunks.push(html);
         }
@@ -76,28 +76,19 @@ watch(differs, (newDiffers: Differ[]) => {
         </div>
     </div>
     <div v-if="!differencesDetected" class="alert alert-success">No differences detected</div>
-    <div v-else class="diff text-muted" v-html="diffHtml"></div>
+    <div v-else class="diff">
+        <pre><code class="hljs" v-html="diffHtml"></code></pre>
+    </div>
 </template>
 
-<style lang="css">
-div.diff
+<style lang="css" scoped>
+.diff
 {
-    font-family: var(--bs-font-monospace);
-    color: inherit;
-    white-space: pre;
-    border: 0.0625rem solid #3d444d;
-    border-radius: 0.375rem !important;
-    padding: 0.5rem;
-    margin-top: 0.5rem;
+ 	border: 0.0625rem solid #3d444d;
+	border-radius: 0.375rem !important;
 }
-del.diff {
-    color: var(--bs-body-color);
-    background-color: rgba(var(--bs-danger-rgb), 0.5) !important;
-    text-decoration: none;
-}
-ins.diff {
-    color: var(--bs-body-color);
-    background-color: rgba(var(--bs-success-rgb), 0.5) !important;
-    text-decoration: none;
+.diff > pre
+{
+    margin: 0;
 }
 </style>
