@@ -13,7 +13,8 @@ const formatter = computed<Formatter|null>(() => {
     return getFormatterFromFilename(props.diffFile.name);
 });
 
-const applyFormatter = ref<Boolean>(false);
+const ignoreCase = ref<boolean>(false);
+const applyFormatter = ref<boolean>(false);
 
 const leftText = computed<string>(() => new TextDecoder().decode(props.diffFile.left!.data));
 const leftDisplayText = computed<string>(() => applyFormatter.value && formatter.value !== null ? formatter.value.apply(leftText.value) : leftText.value);
@@ -25,8 +26,15 @@ const differs = computed<Differ[]>(() => getDiffersFromFilename(props.diffFile.n
 
 const differ = ref<Differ>(differs.value[0]);
 
+function applyDiff(oldText: string, newText: string)
+{
+    if (differ.value.supportsCaseSensitivity) {
+        return differ.value.apply(oldText, newText, ignoreCase.value);
+    }
+    return differ.value.apply(oldText, newText);
+}
 const differencesDetected = computed<boolean>(() => {
-    const changes = differ.value.apply(leftDisplayText.value, rightDisplayText.value);
+    const changes = applyDiff(leftDisplayText.value, rightDisplayText.value);
     for (const change of changes) {
         if (change.added || change.removed) {
             return true;
@@ -36,7 +44,7 @@ const differencesDetected = computed<boolean>(() => {
 });
 
 const diffHtml = computed<string>(() => {
-    const changes = differ.value.apply(leftDisplayText.value, rightDisplayText.value);
+    const changes = applyDiff(leftDisplayText.value, rightDisplayText.value);
     const chunks: string[] = [];
     changes.forEach((change) => {
         const html = change.value
@@ -69,9 +77,13 @@ watch(differs, (newDiffers: Differ[]) => {
             </select>
         </div>
         <div class="col pt-1">
-            <div v-if="formatter !== null" class="form-check form-switch">
+            <div v-if="formatter !== null" class="form-check form-check-inline form-switch">
                 <input class="form-check-input" type="checkbox" role="switch" :id="`zd-td-apply-formatter-${uniqueID}`" v-model="applyFormatter" />
                 <label class="form-check-label" :for="`zd-td-apply-formatter-${uniqueID}`">{{ formatter.actionName }}</label>
+            </div>
+            <div v-if="differ.supportsCaseSensitivity" class="form-check form-check-inline form-switch">
+                <input class="form-check-input" type="checkbox" role="switch" :id="`zd-td-ignore-case-${uniqueID}`" v-model="ignoreCase" />
+                <label class="form-check-label" :for="`zd-td-ignore-case-${uniqueID}`">Case Insensitive</label>
             </div>
         </div>
     </div>

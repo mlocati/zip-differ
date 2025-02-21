@@ -63,15 +63,24 @@ const FORMATTERS: Record<'CSS'|'Html'|'JavaScript'|'XML', Formatter> = {
     },
 }
 
-export interface Differ
-{
+interface CaseUnawareDiffer {
     name: string;
+    supportsCaseSensitivity: false;
     apply: (oldText: string, newText: string) => ReadonlyArray<Diff.Change>;
 }
 
-const DIFFERS: Record<'Patch'|'CharsCI'|'CharsCS'|'CSS'|'JSON'|'Lines'|'WordsCI'|'WordsCS'|'WordsIgnoreSpaces_CI'|'WordsIgnoreSpaces_CS', Differ> = {
+interface CaseAwareDiffer {
+    name: string;
+    supportsCaseSensitivity: true;
+    apply: (oldText: string, newText: string, ignoreCase: boolean) => ReadonlyArray<Diff.Change>;
+}
+
+export type Differ = CaseAwareDiffer | CaseUnawareDiffer;
+
+const DIFFERS: Record<'Patch'|'Chars'|'CSS'|'JSON'|'Lines'|'Words'|'WordsIgnoreSpaces', Differ> = {
     Patch: {
         name: 'Patch',
+        supportsCaseSensitivity: false,
         apply: (oldText: string, newText: string) => {
             let headerReached = false;
             return Diff.createTwoFilesPatch('left', 'right', oldText, newText)
@@ -92,52 +101,43 @@ const DIFFERS: Record<'Patch'|'CharsCI'|'CharsCS'|'CSS'|'JSON'|'Lines'|'WordsCI'
             ;
         },
     },
-    CharsCS: {
-        name: 'Char by Char (case sensitive)',
-        apply: (oldText: string, newText: string) => Diff.diffChars(oldText, newText, {ignoreCase: false}),
+    Chars: {
+        name: 'Char by Char',
+        supportsCaseSensitivity: true,
+        apply: (oldText: string, newText: string, ignoreCase: boolean) => Diff.diffChars(oldText, newText, {ignoreCase}),
     },
-    CharsCI: {
-        name: 'Char by Char (case insensitive)',
-        apply: (oldText: string, newText: string) => Diff.diffChars(oldText, newText, {ignoreCase: true}),
+    Words: {
+        name: 'Word by Word',
+        supportsCaseSensitivity: true,
+        apply: (oldText: string, newText: string, ignoreCase: boolean) => Diff.diffWordsWithSpace(oldText, newText, {ignoreCase}),
     },
-    WordsCS: {
-        name: 'Word by Word (case sensitive)',
-        apply: (oldText: string, newText: string) => Diff.diffWordsWithSpace(oldText, newText, {ignoreCase: false}),
-    },
-    WordsCI: {
-        name: 'Word by Word (case insensitive)',
-        apply: (oldText: string, newText: string) => Diff.diffWordsWithSpace(oldText, newText, {ignoreCase: true}),
-    },
-    WordsIgnoreSpaces_CS: {
-        name: 'Word by Word (ignoring spaces, case sensitive)',
-        apply: (oldText: string, newText: string) => Diff.diffWords(oldText, newText, {ignoreCase: false}),
-    },
-    WordsIgnoreSpaces_CI: {
-        name: 'Word by Word (ignoring spaces, case insensitive)',
-        apply: (oldText: string, newText: string) => Diff.diffWords(oldText, newText, {ignoreCase: true}),
+    WordsIgnoreSpaces: {
+        name: 'Word by Word (ignoring spaces)',
+        supportsCaseSensitivity: true,
+        apply: (oldText: string, newText: string, ignoreCase: boolean) => Diff.diffWords(oldText, newText, {ignoreCase}),
     },
     Lines: {
         name: 'Line by Line',
+        supportsCaseSensitivity: false,
         apply: (oldText: string, newText: string) => Diff.diffLines(oldText, newText),
     },
     CSS: {
         name: 'CSS',
+        supportsCaseSensitivity: false,
         apply: (oldText: string, newText: string) => Diff.diffCss(oldText, newText),
     },
     JSON: {
         name: 'JSON',
+        supportsCaseSensitivity: false,
         apply: (oldText: string, newText: string) => Diff.diffJson(oldText, newText),
     },
 };
 const COMMON_DIFFERS: NonEmptyArray<Differ> = [
     DIFFERS.Patch,
     DIFFERS.Lines,
-    DIFFERS.WordsCS,
-    DIFFERS.WordsCI,
-    DIFFERS.WordsIgnoreSpaces_CS,
-    DIFFERS.WordsIgnoreSpaces_CI,
-    DIFFERS.CharsCS,
-    DIFFERS.CharsCI,
+    DIFFERS.Words,
+    DIFFERS.WordsIgnoreSpaces,
+    DIFFERS.Chars,
 ];
 
 interface ImageFile {
