@@ -194,13 +194,7 @@ onMounted(() => {
             <ul>
                 <Entry :inputItem="inputArchive" />
             </ul>
-            <div>
-            </div>
         </main>
-        <footer v-if="!busy && inputArchive !== null">
-            Total size: <span :title="`${inputArchive.totalSize} bytes`">{{  inputArchive.totalSizeFormatted }}</span>
-            Compressed size: <span :title="`${inputArchive.compressedSize} bytes`">{{ inputArchive.compressedSizeFormatted }}</span>
-        </footer>
     </aside>
 </template>
 
@@ -221,7 +215,7 @@ onMounted(() => {
         flex: 1;
         display: flex;
         overflow: auto;
-        max-height: calc(100vh - 155px);
+        max-height: calc(100vh - 120px);
     }
     aside > main.message {
         justify-content: center;

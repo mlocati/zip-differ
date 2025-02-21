@@ -30,7 +30,7 @@ function click()
 
 <template>
     <li :class="inputItem instanceof InputArchive ? 'archive' : isFolder ? (inputItem.tags.isOpen ? 'folder-open' : 'folder-closed') : 'file'">
-        <a href="#" @click.prevent="click()" :title="inputItem instanceof InputFile ? inputItem.sizeFormatted : ''" :class="{'fw-bold': inputItem instanceof InputArchive}">
+        <a href="#" @click.prevent="click()" :class="{'fw-bold': inputItem instanceof InputArchive}">
             {{ inputItem instanceof InputArchive ? inputItem.archiveFilename : inputItem.name }}
         </a>
         <ul v-if="isFolder" v-show="inputItem.tags.isOpen">
