@@ -1,4 +1,4 @@
-import type { InputArchive, InputDirectory, InputItem, InputFile } from "./InputArchive";
+import { InputArchive, type InputDirectory, type InputItem, type InputFile } from "./InputArchive";
 
 export abstract class DiffEntry
 {
@@ -106,34 +106,38 @@ export class DiffDirectory extends DiffEntry
                 }
             }
         } else {
-            const rightDirs: InputDirectory[] = [];
-            left.subdirs.forEach((leftSubdir: InputDirectory): void => {
-                const rightSubdir = right.getDirectoryByPath(leftSubdir.name);
-                if (rightSubdir === null) {
-                    this.subdirs.push(new DiffDirectory(leftSubdir, null, this));
-                    return;
-                }
-                rightDirs.push(rightSubdir);
-                this.subdirs.push(new DiffDirectory(leftSubdir, rightSubdir, this));
-            });
-            right.subdirs
-                .filter((rightSubdir: InputDirectory) => !rightDirs.includes(rightSubdir))
-                .forEach((rightSubdir: InputDirectory) => this.subdirs.push(new DiffDirectory(null, rightSubdir, this)))
-            ;
-            const rightFiles: InputFile[] = [];
-            left.files.forEach((leftFile: InputFile): void => {
-                const rightFile = right.getFileByPath(leftFile.name);
-                if (rightFile === null) {
-                    this.files.push(new DiffFile(leftFile, null, this));
-                    return;
-                }
-                rightFiles.push(rightFile);
-                this.files.push(new DiffFile(leftFile, rightFile, this));
-            });
-            right.files
-                .filter((rightFile: InputFile) => !rightFiles.includes(rightFile))
-                .forEach((rightFile: InputFile) => this.files.push(new DiffFile(null, rightFile, this)))
-            ;
+            if (left instanceof InputArchive && right instanceof InputArchive && left.files.length === 0 && right.files.length === 0 && left.subdirs.length === 1 && right.subdirs.length === 1) {
+                this.subdirs.push(new DiffDirectory(left.subdirs[0], right.subdirs[0], this));
+            } else {
+                const rightDirs: InputDirectory[] = [];
+                left.subdirs.forEach((leftSubdir: InputDirectory): void => {
+                    const rightSubdir = right.getDirectoryByPath(leftSubdir.name);
+                    if (rightSubdir === null) {
+                        this.subdirs.push(new DiffDirectory(leftSubdir, null, this));
+                        return;
+                    }
+                    rightDirs.push(rightSubdir);
+                    this.subdirs.push(new DiffDirectory(leftSubdir, rightSubdir, this));
+                });
+                right.subdirs
+                    .filter((rightSubdir: InputDirectory) => !rightDirs.includes(rightSubdir))
+                    .forEach((rightSubdir: InputDirectory) => this.subdirs.push(new DiffDirectory(null, rightSubdir, this)))
+                ;
+                const rightFiles: InputFile[] = [];
+                left.files.forEach((leftFile: InputFile): void => {
+                    const rightFile = right.getFileByPath(leftFile.name);
+                    if (rightFile === null) {
+                        this.files.push(new DiffFile(leftFile, null, this));
+                        return;
+                    }
+                    rightFiles.push(rightFile);
+                    this.files.push(new DiffFile(leftFile, rightFile, this));
+                });
+                right.files
+                    .filter((rightFile: InputFile) => !rightFiles.includes(rightFile))
+                    .forEach((rightFile: InputFile) => this.files.push(new DiffFile(null, rightFile, this)))
+                ;
+            }
         }
         this.notes = notes;
     }
