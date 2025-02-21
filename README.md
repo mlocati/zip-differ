@@ -7,10 +7,6 @@ It's a client-only tool: the archives and their content never leave your compute
 
 Want a sample demo? [Here it is](https://mlocati.github.io/zip-differ/?left=sample-data/a.zip&right=sample-data/b.zip).
 
-## A brief introductory video
-
-[![Zip Differ intro](https://img.youtube.com/vi/gA0uqBeGDPg/0.jpg)](https://youtu.be/gA0uqBeGDPg)
-
 ## Compilation
 
 Install dependencies (keeping the configured one)
