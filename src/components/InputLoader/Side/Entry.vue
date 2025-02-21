@@ -18,7 +18,9 @@ onMounted(() => {
 
 function click()
 {
-    if (props.inputItem instanceof InputDirectory) {
+    if (props.inputItem instanceof InputArchive) {
+        EventBus.emit('viewInputArchive', props.inputItem);
+    } else if (props.inputItem instanceof InputDirectory) {
         props.inputItem.tags.isOpen = !props.inputItem.tags.isOpen;
     } else if (props.inputItem instanceof InputFile) {
         EventBus.emit('viewInputFile', props.inputItem);
@@ -27,7 +29,7 @@ function click()
 </script>
 
 <template>
-    <li :class="isFolder ? (inputItem.tags.isOpen ? 'folder-open' : 'folder-closed') : 'file'">
+    <li :class="inputItem instanceof InputArchive ? 'archive' : isFolder ? (inputItem.tags.isOpen ? 'folder-open' : 'folder-closed') : 'file'">
         <a href="#" @click.prevent="click()" :title="inputItem instanceof InputFile ? inputItem.sizeFormatted : ''" :class="{'fw-bold': inputItem instanceof InputArchive}">
             {{ inputItem instanceof InputArchive ? inputItem.archiveFilename : inputItem.name }}
         </a>
@@ -49,13 +51,12 @@ li a {
 }
 li a:hover {
     color: var(--bs-link-color);
-    text-decoration: underline;
 }
 li span.bold {
     font-weight: bold;
 }
-li.folder-open, li.folder-closed {
-    cursor: pointer;
+li.archive>a::before {
+    content: '\1f4e6\a0';
 }
 li.folder-open>a::before {
     content: '\229f\a0';

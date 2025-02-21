@@ -5,6 +5,7 @@ import DiffArchiveViewer from './components/DiffArchiveViewer.vue';
 import InputFileViewerModal from './components/InputFileViewerModal.vue';
 import InputLoader from './components/InputLoader.vue';
 import DiffFileViewerModal from './components/DiffFileViewerModal.vue';
+import InputArchiveInfoModal from './components/InputArchiveInfoModal.vue';
 
 const inputLoader = ref<typeof InputLoader>();
 
@@ -31,6 +32,7 @@ function diffReady(diffArchive: DiffArchive): void
   <InputLoader v-show="viewingDiff === null" ref="inputLoader" @diffReady="diffReady" />
   <DiffArchiveViewer v-if="viewingDiff !== null" :diffArchive="viewingDiff" />
   <div class="modals-container">
+    <InputArchiveInfoModal />
     <InputFileViewerModal  />
     <DiffFileViewerModal />
 </div>

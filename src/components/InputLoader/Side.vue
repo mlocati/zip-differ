@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue';
-import { readFile, readArrayByffer, InputArchive } from '../../InputArchive';
+import { readFile, readArrayBuffer, InputArchive } from '../../InputArchive';
 import Entry from './Side/Entry.vue';
 
 const dropArea = ref<HTMLElement>();
@@ -100,7 +100,7 @@ async function loadFromURL(urlString: string): Promise<boolean>
             }
         }
         busyMessage.value = `Decompressing ${filename}...`;
-        archive = await readArrayByffer(filename, arrayBuffer, url);
+        archive = await readArrayBuffer(filename, arrayBuffer, url);
     }
     catch (e: Error|any) {
         window.alert(e?.message || e?.toString() || 'Unknown error');

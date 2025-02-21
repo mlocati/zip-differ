@@ -8,6 +8,26 @@ export enum Origins
 
 export type Origin = URL | Origins;
 
+function download(filename: string, data: ArrayBuffer): void
+{
+    const blob = new Blob([data], {type: 'application/octet-stream'});
+    const url = URL.createObjectURL(blob);
+
+    try {
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        try {
+            a.click();
+        } finally {
+            document.body.removeChild(a);
+        }
+    } finally {
+        URL.revokeObjectURL(url);
+    }
+}
+
 export abstract class InputItem
 {
     readonly name: string;
@@ -49,21 +69,7 @@ export class InputFile extends InputItem
     }
     download(): void
     {
-        const blob = new Blob([this.data], {type: 'application/octet-stream'});
-        const url = URL.createObjectURL(blob);
-        try {
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = this.name;
-            document.body.appendChild(a);
-            try {
-                a.click();
-            } finally {
-                document.body.removeChild(a);
-            }
-        } finally {
-            URL.revokeObjectURL(url);
-        }
+        download(this.name, this.data);
     }
 }
 
@@ -158,19 +164,27 @@ export class InputDirectory extends InputItem
 export class InputArchive extends InputDirectory
 {
     readonly archiveFilename: string;
-    readonly compressedSize: number;
+    readonly compressedData: ArrayBuffer;
+    get compressedSize(): number {
+        return this.compressedData.byteLength;
+    }
     readonly origin: Origin;
     get compressedSizeFormatted(): string
     {
         return formatSize(this.compressedSize);
     }
 
-    constructor(archiveFilename: string, compressedSize: number, origin: Origin)
+    constructor(archiveFilename: string, compressedData: ArrayBuffer, origin: Origin)
     {
         super('', null);
         this.archiveFilename = archiveFilename;
-        this.compressedSize = compressedSize;
+        this.compressedData = compressedData;
         this.origin = origin;
+    }
+
+    download(): void
+    {
+        download(this.archiveFilename, this.compressedData);
     }
 }
 
@@ -201,9 +215,9 @@ async function processZipEntry(entry: JSZip.JSZipObject, result: InputArchive): 
     dir.files.push(new InputFile(chunks[chunks.length - 1], dir, await entry.async('uint8array')));
 }
 
-async function parseZipContents(archiveFilename: string, zipCompressedSize: number, contents: JSZip, origin: Origin): Promise<InputArchive>
+async function parseZipContents(archiveFilename: string, compressedData: ArrayBuffer, contents: JSZip, origin: Origin): Promise<InputArchive>
 {
-    const result = new InputArchive(archiveFilename, zipCompressedSize, origin);
+    const result = new InputArchive(archiveFilename, compressedData, origin);
     for (const [_, entry] of Object.entries(contents.files)) {
         await processZipEntry(entry, result);
     }
@@ -211,11 +225,11 @@ async function parseZipContents(archiveFilename: string, zipCompressedSize: numb
     return result;
 }
 
-export async function readArrayByffer(archiveFilename: string, buffer: ArrayBuffer, origin: Origin): Promise<InputArchive>
+export async function readArrayBuffer(archiveFilename: string, buffer: ArrayBuffer, origin: Origin): Promise<InputArchive>
 {
     const jszip = new JSZip();
     const contents = await jszip.loadAsync(buffer, {createFolders: true});
-    return await parseZipContents(archiveFilename, buffer.byteLength, contents, origin);
+    return await parseZipContents(archiveFilename, buffer, contents, origin);
 }
 
 export async function readFile(file: File): Promise<InputArchive>
@@ -224,7 +238,7 @@ export async function readFile(file: File): Promise<InputArchive>
         const reader = new FileReader();
         reader.onload = async () => {
             try {
-                resolve(await readArrayByffer(file.name, <ArrayBuffer>reader.result, Origins.LocalComputer));
+                resolve(await readArrayBuffer(file.name, <ArrayBuffer>reader.result, Origins.LocalComputer));
             } catch (e) {
                 reject(e);
             }

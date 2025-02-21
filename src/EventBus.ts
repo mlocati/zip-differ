@@ -1,8 +1,9 @@
 import mitt from 'mitt';
-import type { InputFile } from './InputArchive';
+import type { InputArchive, InputFile } from './InputArchive';
 import type { DiffFile } from './Differ';
 
 type Events = {
+    viewInputArchive: InputArchive,
     viewInputFile: InputFile,
     viewDiffFile: DiffFile,
 };
