@@ -14,6 +14,7 @@
     "bootstrap": "^5.3.3",
     "diff": "^7.0.0",
     "highlight.js": "^11.11.1",
+    "image-compare-viewer": "^1.6.2",
     "js-beautify": "^1.15.3",
     "jszip": "^3.10.1",
     "mitt": "^3.0.1",
