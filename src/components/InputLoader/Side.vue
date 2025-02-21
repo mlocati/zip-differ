@@ -2,6 +2,7 @@
 import { computed, onMounted, ref, watch } from 'vue';
 import { readFile, readArrayBuffer, InputArchive } from '../../InputArchive';
 import Entry from './Side/Entry.vue';
+import { download } from '../../Downloader';
 
 const dropArea = ref<HTMLElement>();
 const fileInput = ref<HTMLInputElement>();
@@ -83,24 +84,9 @@ async function loadFromURL(urlString: string): Promise<boolean>
         if (!['http:', 'https:'].includes(url.protocol)) {
             throw new Error('Only HTTP and HTTPS URLs are supported');
         }
-        const response = await fetch(url, {
-            method: 'GET',
-            redirect: 'follow',
-        });
-        if (!response.ok) {
-            throw new Error(`HTTP error ${response.status}`);
-        }
-        const arrayBuffer = await response.arrayBuffer();
-        let filename = url.pathname.split('/').pop() ?? 'file.zip';
-        const contentDisposition = response.headers.get('Content-Disposition');
-        if (contentDisposition) {
-            const match = contentDisposition.match(/^(.*?;)?\s*filename\s*=\s*"([^"]+)"/i);
-            if (match) {
-                filename = match[2];
-            }
-        }
+        const {data, filename} = await download(url, {fileExtension: 'zip'});
         busyMessage.value = `Decompressing ${filename}...`;
-        archive = await readArrayBuffer(filename, arrayBuffer, url);
+        archive = await readArrayBuffer(filename!, data, url);
     }
     catch (e: Error|any) {
         window.alert(e?.message || e?.toString() || 'Unknown error');
