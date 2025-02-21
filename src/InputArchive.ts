@@ -5,6 +5,7 @@ export abstract class InputItem
 {
     readonly name: string;
     readonly parent: InputDirectory|null;
+    readonly tags: {[key: string]: any} = {};
     get inputArchive(): InputArchive
     {
         if (this instanceof InputArchive) {
