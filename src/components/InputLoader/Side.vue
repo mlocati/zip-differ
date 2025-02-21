@@ -100,7 +100,7 @@ async function loadFromURL(urlString: string): Promise<boolean>
             }
         }
         busyMessage.value = `Decompressing ${filename}...`;
-        archive = await readArrayByffer(filename, arrayBuffer);
+        archive = await readArrayByffer(filename, arrayBuffer, url);
     }
     catch (e: Error|any) {
         window.alert(e?.message || e?.toString() || 'Unknown error');

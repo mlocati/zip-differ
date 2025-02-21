@@ -1,6 +1,13 @@
 import JSZip from 'jszip'
 import { formatSize } from './Size';
 
+export enum Origins
+{
+    LocalComputer,
+}
+
+export type Origin = URL | Origins;
+
 export abstract class InputItem
 {
     readonly name: string;
@@ -152,16 +159,18 @@ export class InputArchive extends InputDirectory
 {
     readonly archiveFilename: string;
     readonly compressedSize: number;
+    readonly origin: Origin;
     get compressedSizeFormatted(): string
     {
         return formatSize(this.compressedSize);
     }
 
-    constructor(archiveFilename: string, compressedSize: number)
+    constructor(archiveFilename: string, compressedSize: number, origin: Origin)
     {
         super('', null);
         this.archiveFilename = archiveFilename;
         this.compressedSize = compressedSize;
+        this.origin = origin;
     }
 }
 
@@ -192,9 +201,9 @@ async function processZipEntry(entry: JSZip.JSZipObject, result: InputArchive): 
     dir.files.push(new InputFile(chunks[chunks.length - 1], dir, await entry.async('uint8array')));
 }
 
-async function parseZipContents(archiveFilename: string, zipCompressedSize: number, contents: JSZip): Promise<InputArchive>
+async function parseZipContents(archiveFilename: string, zipCompressedSize: number, contents: JSZip, origin: Origin): Promise<InputArchive>
 {
-    const result = new InputArchive(archiveFilename, zipCompressedSize);
+    const result = new InputArchive(archiveFilename, zipCompressedSize, origin);
     for (const [_, entry] of Object.entries(contents.files)) {
         await processZipEntry(entry, result);
     }
@@ -202,11 +211,11 @@ async function parseZipContents(archiveFilename: string, zipCompressedSize: numb
     return result;
 }
 
-export async function readArrayByffer(archiveFilename: string, buffer: ArrayBuffer): Promise<InputArchive>
+export async function readArrayByffer(archiveFilename: string, buffer: ArrayBuffer, origin: Origin): Promise<InputArchive>
 {
     const jszip = new JSZip();
     const contents = await jszip.loadAsync(buffer, {createFolders: true});
-    return await parseZipContents(archiveFilename, buffer.byteLength, contents);
+    return await parseZipContents(archiveFilename, buffer.byteLength, contents, origin);
 }
 
 export async function readFile(file: File): Promise<InputArchive>
@@ -215,7 +224,7 @@ export async function readFile(file: File): Promise<InputArchive>
         const reader = new FileReader();
         reader.onload = async () => {
             try {
-                resolve(await readArrayByffer(file.name, <ArrayBuffer>reader.result))
+                resolve(await readArrayByffer(file.name, <ArrayBuffer>reader.result, Origins.LocalComputer));
             } catch (e) {
                 reject(e);
             }

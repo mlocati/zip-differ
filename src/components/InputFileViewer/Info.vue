@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { InputFile } from '../../InputArchive';
 import { formatSize } from '../../Size';
+import OriginViewer from '../OriginViewer.vue';
 
 defineProps<{
     inputFile: InputFile,
@@ -13,7 +14,10 @@ defineProps<{
         <tbody>
             <tr>
                 <th>Archive</th>
-                <td><code>{{ inputFile.inputArchive.archiveFilename }}</code></td>
+                <td>
+                    <code>{{ inputFile.inputArchive.archiveFilename }}</code>
+                    <div class="small text-muted">Source: <OriginViewer :origin="inputFile.inputArchive.origin" /></div>
+                </td>
             </tr>
             <tr>
                 <th>Name</th>

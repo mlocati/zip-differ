@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { formatSize } from '../../Size';
 import type { DiffFile } from '../../Differ';
+import OriginViewer from '../OriginViewer.vue';
 
 defineProps<{
     diffFile: DiffFile,
@@ -12,8 +13,14 @@ defineProps<{
         <tbody>
             <tr>
                 <th>Archive</th>
-                <td><code>{{ diffFile.left!.inputArchive.archiveFilename }}</code></td>
-                <td><code>{{ diffFile.right!.inputArchive.archiveFilename }}</code></td>
+                <td>
+                    <code>{{ diffFile.left!.inputArchive.archiveFilename }}</code>
+                    <div class="small text-muted">Source: <OriginViewer :origin="diffFile.left!.inputArchive.origin" /></div>
+                </td>
+                <td>
+                    <code>{{ diffFile.right!.inputArchive.archiveFilename }}</code>
+                    <div class="small text-muted">Source: <OriginViewer :origin="diffFile.right!.inputArchive.origin" /></div>
+                </td>
             </tr>
             <tr>
                 <th>Name</th>
