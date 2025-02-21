@@ -10,7 +10,7 @@ const props = defineProps<{
 const isFolder = computed<Boolean>(() => props.inputItem instanceof InputDirectory);
 
 onMounted(() => {
-    if (props.inputItem instanceof InputDirectory) {
+    if (props.inputItem instanceof InputDirectory && props.inputItem.tags.isOpen === undefined) {
         props.inputItem.tags.isOpen = props.inputItem.parent === null || props.inputItem.parent.parent === null;
     }
     
