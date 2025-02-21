@@ -4,6 +4,7 @@ import { DiffFile } from '../Differ';
 import EventBus from '../EventBus';
 import * as bootstrap from 'bootstrap';
 import DiffFileViewer from './DiffFileViewer.vue';
+import FullScreenToggle from './Modal/FullScreenToggle.vue';
 
 const diffFile = ref<DiffFile|null>(null);
 const modal = ref<HTMLDivElement>();
@@ -44,6 +45,7 @@ onUnmounted(() => {
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">{{ diffFile?.name }}</h5>
+            <FullScreenToggle />
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">

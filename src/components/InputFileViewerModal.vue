@@ -4,6 +4,7 @@ import { InputFile } from '../InputArchive';
 import EventBus from '../EventBus';
 import * as bootstrap from 'bootstrap';
 import InputFileViewer from './InputFileViewer.vue';
+import FullScreenToggle from './Modal/FullScreenToggle.vue';
 
 const inputFile = ref<InputFile|null>(null);
 const modal = ref<HTMLDivElement>();
@@ -44,6 +45,7 @@ onUnmounted(() => {
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">{{ inputFile?.name }}</h5>
+            <FullScreenToggle />
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
