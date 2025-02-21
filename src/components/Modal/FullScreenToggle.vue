@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+import { Tooltip } from 'bootstrap';
 
 const button = ref<HTMLButtonElement>();
 const isModalFullscreen = ref<boolean>(false);
@@ -46,7 +47,18 @@ function listenModalHide(): void
     }
 }
 
+const vBootstrapTooltip = {
+    mounted: (el: HTMLElement) => new Tooltip(el)
+};
+
+function hideTooltip(): void
+{
+    if (button.value) {
+        Tooltip.getInstance(button.value)?.hide();
+    }
+}
 onMounted(() => {
+    document.addEventListener('fullscreenchange', hideTooltip);
     const title = modalDialog.value?.querySelector(':scope .modal-title') as HTMLElement;
     if (title) {
         title.style.flex = "1";
@@ -54,14 +66,16 @@ onMounted(() => {
     modal.value?.addEventListener('show.bs.modal', listenModalShow);
     modal.value?.addEventListener('hide.bs.modal', listenModalHide);
 });
+
 onUnmounted(() => {
+    document.removeEventListener('fullscreenchange', hideTooltip);
     modal.value?.removeEventListener('show.bs.modal', listenModalShow);
     modal.value?.removeEventListener('hide.bs.modal', listenModalHide);
 });
 </script>
 
 <template>
-    <button ref="button" class="btn btn-sm" :class="isModalFullscreen ? 'btn-success' : 'btn-light'" @click.prevent="toggle">
+    <button ref="button" class="btn btn-sm" :class="isModalFullscreen ? 'btn-success' : 'btn-light'" v-bootstrap-tooltip title="Toggle Fullscreen" @click.prevent="toggle">
         &#x26F6;
     </button>
 </template>
