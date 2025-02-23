@@ -2,12 +2,13 @@
 import { computed, onMounted, ref, watch } from 'vue';
 import { readFile, readArrayBuffer, InputArchive } from '../../InputArchive';
 import Entry from './Side/Entry.vue';
-import { download } from '../../Downloader';
+import { download, type Options } from '../../Downloader';
 
 const dropArea = ref<HTMLElement>();
 const fileInput = ref<HTMLInputElement>();
-const busyMessage = ref<String>('');
-const busy = computed<Boolean>(() => busyMessage.value.length !== 0);
+const busyMessage = ref<string>('');
+const loadError = ref<string>('');
+const busy = computed<boolean>(() => busyMessage.value.length !== 0);
 const inputArchive = ref<InputArchive|null>(null);
 
 const props = defineProps({
@@ -26,22 +27,22 @@ watch(inputArchive, (archive) => {
     emit('inputArchiveLoaded', archive);
 });
 
-async function processFile(file: File) {
+async function loadFile(file: File) {
+    loadError.value = '';
     if (!/\.zip$/i.test(file.name)) {
         if (!window.confirm("That doesn't seem to be a ZIP file. Are you sure you want to proceed?")) {
             return;
         }
     }
     if (!file.size) {
-        window.alert('The file is empty');
+        loadError.value = 'The file is empty';
         return;
     }
     busyMessage.value = 'Decompressing...';
     try {
         inputArchive.value = await readFile(file);
     } catch (e: Error|any) {
-        window.alert(e?.message || e?.toString() || 'Unknown error');
-        return;
+        loadError.value = e?.message || e?.toString() || 'Unknown error';
     } finally {
         busyMessage.value = '';
     }
@@ -50,6 +51,7 @@ async function processFile(file: File) {
 function clear()
 {
     inputArchive.value = null;
+    loadError.value = '';
 }
 
 async function askUrl()
@@ -64,38 +66,31 @@ async function askUrl()
         if (urlString === '') {
             return;
         }
-        try {
-            if (await loadFromURL(urlString)) {
-                return;
-            }
-        }
-        catch (e: Error|any) {
-            window.alert(e?.message || e?.toString() || 'Unknown error');
+        if (await loadUrl(urlString, {fileExtension: 'zip'})) {
+            return;
         }
     }
 }
 
-async function loadFromURL(urlString: string): Promise<boolean>
+async function loadUrl(url: string|URL, options: Options): Promise<boolean>
 {
-    let archive: InputArchive;
-    busyMessage.value = `Downloading ${urlString}...`;
+    loadError.value = '';
     try {
-        const url = new URL(urlString, window.location.href);
-        if (!['http:', 'https:'].includes(url.protocol)) {
-            throw new Error('Only HTTP and HTTPS URLs are supported');
+        if (typeof url === 'string') {
+            url = new URL(url, window.location.href);
         }
-        const {data, filename} = await download(url, {fileExtension: 'zip'});
+        busyMessage.value = `Downloading ${url}...`;
+        const {data, filename} = await download(url, options);
         busyMessage.value = `Decompressing ${filename}...`;
-        archive = await readArrayBuffer(filename!, data, url);
+        inputArchive.value = await readArrayBuffer(filename!, data, url);
+        return true;
     }
     catch (e: Error|any) {
-        window.alert(e?.message || e?.toString() || 'Unknown error');
+        loadError.value = e?.message || e?.toString() || 'Unknown error';
         return false;
     } finally {
         busyMessage.value = '';
     }
-    inputArchive.value = archive;
-    return true;
 }
 
 function setInputArchive(zip: InputArchive|null)
@@ -119,31 +114,26 @@ onMounted(() => {
         e.preventDefault();
         dropArea.value?.classList.remove('dragover');
         if (e.dataTransfer?.files?.length === 1) {
-            processFile(e.dataTransfer.files[0]);
+            loadFile(e.dataTransfer.files[0]);
         }
     });
     fileInput.value?.addEventListener('change', () => {
-        const i = fileInput.value;
-        if (!i || !i.files) {
+        const files: FileList|null|undefined = fileInput.value?.files;
+        if (!files?.length) {
             return;
         }
-        if (!i.files.length) {
-            return;
+        loadError.value = '';
+        fileInput.value!.value = '';
+        if (files.length !== 1) {
+            loadError.value = 'Please select only one file';
         }
-        if (i.files.length !== 1) {
-            i.value = '';
-            window.alert('Please select only one file');
-            return;
-        }
-        const file = i.files[0];
-        i.value = '';
-        processFile(file);
+        loadFile(files[0]);
     });
     if (props.queryStringParam) {
         const params = new URLSearchParams(document.location.search);
         const initialUrl = params.get(props.queryStringParam);
         if (initialUrl) {
-            loadFromURL(initialUrl);
+            loadUrl(initialUrl, {fileExtension: 'zip'});
         }
     }
 });
@@ -173,8 +163,9 @@ onMounted(() => {
         <main v-if="busy" class="message">
             {{ busyMessage }}
         </main>
-        <main v-else-if="inputArchive === null" class="message">
+        <main v-else-if="inputArchive === null" class="message" style="flex-direction: column">
             Open a file, or drop it here.
+            <div v-if="loadError" class="alert alert-danger mt-2" style="white-space: pre-wrap">{{ loadError }}</div>
         </main>
         <main v-else class="contents">
             <ul>
