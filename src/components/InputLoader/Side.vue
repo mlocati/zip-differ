@@ -4,6 +4,7 @@ import { readFile, readArrayBuffer, InputArchive } from '../../InputArchive';
 import Entry from './Side/Entry.vue';
 import { download, type Options } from '../../Downloader';
 import AskUrlModal from './Side/AskUrlModal.vue';
+import * as UrlService from '../../UrlService';
 
 const dropArea = ref<HTMLElement>();
 const fileInput = ref<HTMLInputElement>();
@@ -45,8 +46,12 @@ async function loadFile(file: File) {
         inputArchive.value = await readFile(file);
     } catch (e: Error|any) {
         loadError.value = e?.message || e?.toString() || 'Unknown error';
+        return;
     } finally {
         busyMessage.value = '';
+    }
+    if (props.queryStringParam) {
+        UrlService.setDownloadUrl(props.queryStringParam, null);
     }
 }
 
@@ -54,6 +59,9 @@ function clear()
 {
     inputArchive.value = null;
     loadError.value = '';
+    if (props.queryStringParam) {
+        UrlService.setDownloadUrl(props.queryStringParam, null);
+    }
 }
 
 async function askUrl()
@@ -65,17 +73,17 @@ async function askUrl()
     askUrlModal.value?.open(url instanceof URL ? url.toString() : '');
 }
 
-async function loadUrl(url: string|URL, options?: Options): Promise<boolean>
+async function loadUrl(url: URL, options?: Options): Promise<boolean>
 {
     loadError.value = '';
     try {
-        if (typeof url === 'string') {
-            url = new URL(url, window.location.href);
-        }
         busyMessage.value = `Downloading ${url}...`;
         const {data, filename} = await download(url, options);
         busyMessage.value = `Decompressing ${filename}...`;
         inputArchive.value = await readArrayBuffer(filename!, data, url);
+        if (props.queryStringParam) {
+            UrlService.setDownloadUrl(props.queryStringParam, {url, options});
+        }
         return true;
     }
     catch (e: Error|any) {
@@ -89,6 +97,9 @@ async function loadUrl(url: string|URL, options?: Options): Promise<boolean>
 function setInputArchive(zip: InputArchive|null)
 {
     inputArchive.value = zip;
+    if (props.queryStringParam) {
+        UrlService.setDownloadUrl(props.queryStringParam, null);
+    }
 }
 
 defineExpose({
@@ -123,10 +134,9 @@ onMounted(() => {
         loadFile(files[0]);
     });
     if (props.queryStringParam) {
-        const params = new URLSearchParams(document.location.search);
-        const initialUrl = params.get(props.queryStringParam);
-        if (initialUrl) {
-            loadUrl(initialUrl);
+        const initialArgs = UrlService.getDownloadUrl(props.queryStringParam);
+        if (initialArgs) {
+            loadUrl(initialArgs.url, initialArgs.options);
         }
     }
 });
