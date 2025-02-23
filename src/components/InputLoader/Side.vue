@@ -3,6 +3,7 @@ import { computed, onMounted, ref, watch } from 'vue';
 import { readFile, readArrayBuffer, InputArchive } from '../../InputArchive';
 import Entry from './Side/Entry.vue';
 import { download, type Options } from '../../Downloader';
+import AskUrlModal from './Side/AskUrlModal.vue';
 
 const dropArea = ref<HTMLElement>();
 const fileInput = ref<HTMLInputElement>();
@@ -10,6 +11,7 @@ const busyMessage = ref<string>('');
 const loadError = ref<string>('');
 const busy = computed<boolean>(() => busyMessage.value.length !== 0);
 const inputArchive = ref<InputArchive|null>(null);
+const askUrlModal = ref<InstanceType<typeof AskUrlModal>>();
 
 const props = defineProps({
     queryStringParam: {
@@ -59,20 +61,11 @@ async function askUrl()
     if (busy.value) {
         return;
     }
-    let urlString : string|null = '';
-    while (true) {
-        urlString = window.prompt('Enter the URL of the ZIP file', urlString);
-        urlString = urlString ? urlString.trim() : '';
-        if (urlString === '') {
-            return;
-        }
-        if (await loadUrl(urlString, {fileExtension: 'zip'})) {
-            return;
-        }
-    }
+    const url = inputArchive?.value?.origin;
+    askUrlModal.value?.open(url instanceof URL ? url.toString() : '');
 }
 
-async function loadUrl(url: string|URL, options: Options): Promise<boolean>
+async function loadUrl(url: string|URL, options?: Options): Promise<boolean>
 {
     loadError.value = '';
     try {
@@ -133,7 +126,7 @@ onMounted(() => {
         const params = new URLSearchParams(document.location.search);
         const initialUrl = params.get(props.queryStringParam);
         if (initialUrl) {
-            loadUrl(initialUrl, {fileExtension: 'zip'});
+            loadUrl(initialUrl);
         }
     }
 });
@@ -173,6 +166,7 @@ onMounted(() => {
             </ul>
         </main>
     </aside>
+    <AskUrlModal ref="askUrlModal" @ready="loadUrl($event.url, $event.options)" />
 </template>
 
 <style lang="css" scoped>

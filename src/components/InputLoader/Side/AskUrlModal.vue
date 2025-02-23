@@ -1,0 +1,90 @@
+<script setup lang="ts">
+import { ref, useId } from 'vue';
+import { DefaultOptions, type Args, type Options } from '../../../Downloader';
+import * as bootstrap from 'bootstrap';
+
+const idPrefix = ref<string>(`zd-askurl-${useId()}`);
+
+const modal = ref<HTMLElement>();
+const form = ref<HTMLFormElement>();
+
+const url = ref<string>('');
+const allowRedirect = ref<boolean>(true);
+const credentials = ref<RequestCredentials>('same-origin');
+
+const emits = defineEmits<{
+  (e: 'ready', data: Args): void,
+}>()
+defineExpose({
+  open,
+});
+
+function open(initialUrl?: string, options?: Options): void
+{
+  url.value = initialUrl || '';
+  allowRedirect.value = (options?.redirect || DefaultOptions.redirect!) === 'follow';
+  credentials.value = options?.credentials || DefaultOptions.credentials!;
+  const el = modal.value;
+  if (!el) {
+    return;
+  }
+  const bsModal = bootstrap.Modal.getInstance(el) || new bootstrap.Modal(el);
+  bsModal.show();
+}
+
+function accept()
+{
+  if (!modal.value || !form.value?.checkValidity()) {
+    form.value?.reportValidity();
+    return;
+  }
+  try {
+    const args: Args = {
+      url: new URL(url.value),
+      options: {
+        redirect: allowRedirect.value ? 'follow' : 'error',
+        credentials: credentials.value,
+      },
+    }
+    emits('ready', args);
+    bootstrap.Modal.getInstance(modal.value)?.hide();
+  } catch (e: Error|any) {
+    window.alert(e?.message || e?.toString() || 'Unknown error');
+  }
+}
+</script>
+
+<template>
+  <div ref="modal" class="modal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Open URL</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form class="modal-body" onsubmit="return false" ref="form">
+          <div class="mb-3">
+            <label :for="`${idPrefix}-url`" class="form-label">URL</label>
+            <input type="url" class="form-control" :id="`${idPrefix}-url`" required v-model="url" />
+          </div>
+          <div class="mb-3">
+            <label :for="`${idPrefix}-credentials`" class="form-label">Credentials</label>
+            <select class="form-select" :id="`${idPrefix}-credentials`" v-model="credentials">
+              <option value="same-origin">Same Origin</option>
+              <option value="include">Include</option>
+              <option value="omit">Omit</option>
+            </select>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" :id="`${idPrefix}-redirect`" v-model="allowRedirect" />
+            <label class="form-check-label" :for="`${idPrefix}-redirect`">Allow Redirect</label>
+          </div>
+        </form>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" @click.prevent="accept()">Download</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>

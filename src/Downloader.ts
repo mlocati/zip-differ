@@ -7,6 +7,12 @@ export interface Options extends RequestInit
     fileExtension?: string;
 }
 
+export const DefaultOptions: Options = {
+    method: 'GET',
+    redirect: 'follow',
+    fileExtension: 'zip',
+    credentials: 'same-origin',
+};
 export interface DownloadResponse
 {
     data: ArrayBuffer;
@@ -18,19 +24,13 @@ export interface DownloadResponse
 
 export interface Args
 {
-    url: string;
+    url: URL;
     options?: Options;
 }
 
 export async function download(url: URL, options?: Options): Promise<DownloadResponse>
 {
-    if (!options) {
-        options = {};
-    }
-    if (!options.redirect) {
-        options.redirect = 'follow';
-    }
-
+    options = structuredClone({ ...DefaultOptions, ...options });
     const fileExtension: string = options.fileExtension?.replace(/^\.+|\.+$/g, '') ?? '';
     delete options.fileExtension;
     const response = await fetch(url.href, options);
