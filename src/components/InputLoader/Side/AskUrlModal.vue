@@ -79,7 +79,7 @@ function accept() {
             <label :for="`${idPrefix}-credentials`" class="form-label">
               Credentials
               <a
-                class="text-decoration-none"
+                class="text-decoration-none text-info-emphasis"
                 href="https://developer.mozilla.org/en-US/docs/Web/API/Request/credentials"
                 target="_blank"
                 v-bootstrap-tooltip
