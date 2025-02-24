@@ -4,6 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "lint": "prettier --check .",
+    "lint:fix": "prettier --write .",
     "predev": "node ./bin/create-samples.js",
     "dev": "vite",
     "prebuild": "node ./bin/create-samples.js",
