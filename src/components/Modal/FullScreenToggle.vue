@@ -1,81 +1,93 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
-import { Tooltip } from 'bootstrap';
+import {computed, onMounted, onUnmounted, ref, watch} from 'vue';
+import {Tooltip} from 'bootstrap';
 
 const button = ref<HTMLButtonElement>();
 const isModalFullscreen = ref<boolean>(false);
-const modalDialog = computed<HTMLElement|null>(() => button.value?.closest('.modal-dialog') ?? null);
-const modal = computed<HTMLElement|null>(() => modalDialog.value?.closest('.modal') ?? null);
-let initialFullscreenElement: Element|null = null;
+const modalDialog = computed<HTMLElement | null>(
+  () => button.value?.closest('.modal-dialog') ?? null,
+);
+const modal = computed<HTMLElement | null>(
+  () => modalDialog.value?.closest('.modal') ?? null,
+);
+let initialFullscreenElement: Element | null = null;
 
 watch(isModalFullscreen, (newIsFullScreen) => {
-    if (!modalDialog.value) {
-        return;
+  if (!modalDialog.value) {
+    return;
+  }
+  if (newIsFullScreen) {
+    modalDialog.value.classList.add('modal-fullscreen');
+    if (document.fullscreenEnabled) {
+      modalDialog.value.requestFullscreen();
     }
-    if (newIsFullScreen) {
-        modalDialog.value.classList.add('modal-fullscreen');
-        if (document.fullscreenEnabled) {
-            modalDialog.value.requestFullscreen();
-        }
-    } else {
-        modalDialog.value.classList.remove('modal-fullscreen');
-        if (document.fullscreenElement == modalDialog.value) {
-            document.exitFullscreen();
-        }
+  } else {
+    modalDialog.value.classList.remove('modal-fullscreen');
+    if (document.fullscreenElement == modalDialog.value) {
+      document.exitFullscreen();
     }
+  }
 });
 
-function toggle(): void
-{
-    if (modalDialog.value) {
-        isModalFullscreen.value = !isModalFullscreen.value;
-    }
+function toggle(): void {
+  if (modalDialog.value) {
+    isModalFullscreen.value = !isModalFullscreen.value;
+  }
 }
 
-function listenModalShow(): void
-{
-    initialFullscreenElement = document.fullscreenElement;
+function listenModalShow(): void {
+  initialFullscreenElement = document.fullscreenElement;
 }
 
-function listenModalHide(): void
-{
-    if (isModalFullscreen.value) {
-        isModalFullscreen.value = false;
-    }
-    if (initialFullscreenElement && initialFullscreenElement !== document.fullscreenElement) {
-        initialFullscreenElement.requestFullscreen();
-    }
+function listenModalHide(): void {
+  if (isModalFullscreen.value) {
+    isModalFullscreen.value = false;
+  }
+  if (
+    initialFullscreenElement &&
+    initialFullscreenElement !== document.fullscreenElement
+  ) {
+    initialFullscreenElement.requestFullscreen();
+  }
 }
 
 const vBootstrapTooltip = {
-    mounted: (el: HTMLElement) => new Tooltip(el)
+  mounted: (el: HTMLElement) => new Tooltip(el),
 };
 
-function hideTooltip(): void
-{
-    if (button.value) {
-        Tooltip.getInstance(button.value)?.hide();
-    }
+function hideTooltip(): void {
+  if (button.value) {
+    Tooltip.getInstance(button.value)?.hide();
+  }
 }
 onMounted(() => {
-    document.addEventListener('fullscreenchange', hideTooltip);
-    const title = modalDialog.value?.querySelector(':scope .modal-title') as HTMLElement;
-    if (title) {
-        title.style.flex = "1";
-    }
-    modal.value?.addEventListener('show.bs.modal', listenModalShow);
-    modal.value?.addEventListener('hide.bs.modal', listenModalHide);
+  document.addEventListener('fullscreenchange', hideTooltip);
+  const title = modalDialog.value?.querySelector(
+    ':scope .modal-title',
+  ) as HTMLElement;
+  if (title) {
+    title.style.flex = '1';
+  }
+  modal.value?.addEventListener('show.bs.modal', listenModalShow);
+  modal.value?.addEventListener('hide.bs.modal', listenModalHide);
 });
 
 onUnmounted(() => {
-    document.removeEventListener('fullscreenchange', hideTooltip);
-    modal.value?.removeEventListener('show.bs.modal', listenModalShow);
-    modal.value?.removeEventListener('hide.bs.modal', listenModalHide);
+  document.removeEventListener('fullscreenchange', hideTooltip);
+  modal.value?.removeEventListener('show.bs.modal', listenModalShow);
+  modal.value?.removeEventListener('hide.bs.modal', listenModalHide);
 });
 </script>
 
 <template>
-    <button ref="button" class="btn btn-sm" :class="isModalFullscreen ? 'btn-success' : 'btn-light'" v-bootstrap-tooltip title="Toggle Fullscreen" @click.prevent="toggle">
-        &#x26F6;
-    </button>
+  <button
+    ref="button"
+    class="btn btn-sm"
+    :class="isModalFullscreen ? 'btn-success' : 'btn-light'"
+    v-bootstrap-tooltip
+    title="Toggle Fullscreen"
+    @click.prevent="toggle"
+  >
+    &#x26F6;
+  </button>
 </template>
