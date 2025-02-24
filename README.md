@@ -7,33 +7,45 @@ It's a client-only tool: the archives and their content never leave your compute
 
 Want a sample demo? [Here it is](https://mlocati.github.io/zip-differ/?left=sample-data/a.zip&right=sample-data/b.zip).
 
-## Compilation
+## Development
 
-Install dependencies (keeping the configured one)
+### Install dependencies (keeping the configured one)
 
 ```sh
 npm ci
 ```
 
-Install dependencies (updating to the latest available versions)
+### Install dependencies (updating to the latest available versions)
 
 ```sh
 npm install
 ```
 
-Build for development
+### Build for development
 
 ```sh
 npm run dev
 ```
 
-Build for production
+### Checking coding style
+
+```sh
+npm run lint
+```
+
+### Fixing coding style
+
+```sh
+npm run lint:fix
+```
+
+### Build for production
 
 ```sh
 npm run build
 ```
 
-Preview the app built for production
+### Preview the app built for production
 
 ```sh
 npm run preview
