@@ -69,5 +69,6 @@ export function getDownloadUrl(prefix: string): DownloadOptions | null {
     credentials: ['include', 'omit', 'same-origin'].includes(rawCredentials)
       ? <RequestCredentials>rawCredentials
       : 'same-origin',
+    fileExtension: 'zip',
   };
 }

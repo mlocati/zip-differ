@@ -41,6 +41,7 @@ function accept() {
       url: new URL(url.value),
       redirect: allowRedirect.value,
       credentials: credentials.value,
+      fileExtension: 'zip',
     };
     emits('ready', options);
     Modal.getInstance(modal.value)?.hide();

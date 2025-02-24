@@ -6,7 +6,7 @@ export interface DownloadOptions {
    * The file extension to use when the filename cannot be extracted from the Content-Disposition response header:
    * This is extracted from the URL
    */
-  fileExtension?: string;
+  fileExtension: string;
 }
 
 export interface DownloadResponse {
@@ -26,7 +26,7 @@ export async function download(
     credentials: options.credentials ?? 'same-origin',
   };
   const fileExtension: string =
-    options.fileExtension?.replace(/^\.+|\.+$/g, '') ?? '';
+    options.fileExtension.replace(/^\.+|\.+$/g, '') ?? '';
   const response = await fetch(options.url, requestInit);
   if (!response.ok) {
     throw new Error(
