@@ -82,7 +82,7 @@ function accept()
           </div>
           <div class="form-check">
             <input class="form-check-input" type="checkbox" :id="`${idPrefix}-redirect`" v-model="allowRedirect" />
-            <label class="form-check-label" :for="`${idPrefix}-redirect`">Allow Redirect</label>
+            <label class="form-check-label" :for="`${idPrefix}-redirect`">Allow redirects</label>
           </div>
         </form>
         <div class="modal-footer">
