@@ -17,13 +17,13 @@ document.addEventListener('fullscreenchange', () => {
 const BootstrapTooltip: Directive<HTMLElement> = {
   mounted(el) {
     if (!Tooltip.getInstance(el)) {
-      new Tooltip(el);
-      if (!elementsWithTooltip.includes(el)) {
-        elementsWithTooltip.push(el);
-      }
+      new Tooltip(el, {container: document.fullscreenElement || 'body'});
+    }
+    if (!elementsWithTooltip.includes(el)) {
+      elementsWithTooltip.push(el);
     }
   },
-  beforeMount(el) {
+  beforeUnmount(el) {
     const index = elementsWithTooltip.indexOf(el);
     if (index > -1) {
       elementsWithTooltip.splice(index, 1);
