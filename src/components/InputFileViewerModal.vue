@@ -2,7 +2,7 @@
 import { nextTick, onMounted, onUnmounted, ref } from 'vue';
 import { InputFile } from '../InputArchive';
 import EventBus from '../EventBus';
-import * as bootstrap from 'bootstrap';
+import { Modal } from 'bootstrap';
 import InputFileViewer from './InputFileViewer.vue';
 import FullScreenToggle from './Modal/FullScreenToggle.vue';
 
@@ -20,9 +20,9 @@ function open(file: InputFile): void
     if (!el) {
       return;
     }
-    let bsModal = bootstrap.Modal.getInstance(el);
+    let bsModal = Modal.getInstance(el);
     if (!bsModal) {
-      bsModal = new bootstrap.Modal(el);
+      bsModal = Modal.getOrCreateInstance(el);
       el.addEventListener('hidden.bs.modal', () => {
         inputFile.value = null;
       });

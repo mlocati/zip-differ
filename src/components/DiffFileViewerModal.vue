@@ -2,7 +2,7 @@
 import { nextTick, onMounted, onUnmounted, ref } from 'vue';
 import { DiffFile } from '../Differ';
 import EventBus from '../EventBus';
-import * as bootstrap from 'bootstrap';
+import { Modal } from 'bootstrap';
 import DiffFileViewer from './DiffFileViewer.vue';
 import FullScreenToggle from './Modal/FullScreenToggle.vue';
 
@@ -20,9 +20,9 @@ function open(file: DiffFile): void
     if (!el) {
       return;
     }
-    let bsModal = bootstrap.Modal.getInstance(el);
+    let bsModal = Modal.getInstance(el);
     if (!bsModal) {
-      bsModal = new bootstrap.Modal(el);
+      bsModal = new Modal(el);
       el.addEventListener('hidden.bs.modal', () => {
         diffFile.value = null;
       });

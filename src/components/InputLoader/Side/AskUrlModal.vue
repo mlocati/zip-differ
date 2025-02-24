@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, useId } from 'vue';
 import { type DownloadOptions } from '../../../Downloader';
-import * as bootstrap from 'bootstrap';
+import { Modal } from 'bootstrap';
 
 const idPrefix = ref<string>(`zd-askurl-${useId()}`);
 
@@ -29,8 +29,7 @@ function open(options: DownloadOptions|null): void
   if (!el) {
     return;
   }
-  const bsModal = bootstrap.Modal.getInstance(el) || new bootstrap.Modal(el);
-  bsModal.show();
+  Modal.getOrCreateInstance(el).show();
 }
 
 function accept()
@@ -46,7 +45,7 @@ function accept()
       credentials: credentials.value,
     };
     emits('ready', options);
-    bootstrap.Modal.getInstance(modal.value)?.hide();
+    Modal.getInstance(modal.value)?.hide();
   } catch (e: Error|any) {
     window.alert(e?.message || e?.toString() || 'Unknown error');
   }

@@ -2,7 +2,7 @@
 import { nextTick, onMounted, onUnmounted, ref } from 'vue';
 import { InputArchive } from '../InputArchive';
 import EventBus from '../EventBus';
-import * as bootstrap from 'bootstrap';
+import { Modal } from 'bootstrap';
 import OriginViewer from './OriginViewer.vue';
 
 const inputArchive = ref<InputArchive|null>(null);
@@ -16,9 +16,9 @@ function viewInputArchive(archive: InputArchive)
     if (!el) {
       return;
     }
-    let bsModal = bootstrap.Modal.getInstance(el);
+    let bsModal = Modal.getInstance(el);
     if (!bsModal) {
-      bsModal = new bootstrap.Modal(el);
+      bsModal = new Modal(el);
       el.addEventListener('hidden.bs.modal', () => {
         inputArchive.value = null;
       });
