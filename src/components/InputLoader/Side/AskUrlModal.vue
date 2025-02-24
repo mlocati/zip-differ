@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, useId } from 'vue';
 import { type DownloadOptions } from '../../../Downloader';
-import { Modal } from 'bootstrap';
+import { Modal, Tooltip } from 'bootstrap';
 
 const idPrefix = ref<string>(`zd-askurl-${useId()}`);
 
@@ -31,6 +31,10 @@ function open(options: DownloadOptions|null): void
   }
   Modal.getOrCreateInstance(el).show();
 }
+
+const vBootstrapTooltip = {
+    mounted: (el: HTMLElement) => new Tooltip(el)
+};
 
 function accept()
 {
@@ -66,11 +70,14 @@ function accept()
             <input type="url" class="form-control" :id="`${idPrefix}-url`" required v-model="url" />
           </div>
           <div class="mb-3">
-            <label :for="`${idPrefix}-credentials`" class="form-label">Credentials</label>
+            <label :for="`${idPrefix}-credentials`" class="form-label">
+              Credentials
+              <a class="text-decoration-none" href="https://developer.mozilla.org/en-US/docs/Web/API/Request/credentials" target="_blank" v-bootstrap-tooltip title="See MDN for more information">&#x1F6C8;</a>
+            </label>
             <select class="form-select" :id="`${idPrefix}-credentials`" v-model="credentials">
-              <option value="same-origin">Same Origin</option>
-              <option value="include">Include</option>
-              <option value="omit">Omit</option>
+              <option value="omit">omit - Never send credentials</option>
+              <option value="same-origin">same-origin - Send credentials for same-origin requests</option>
+              <option value="include">include - Always include credentials</option>
             </select>
           </div>
           <div class="form-check">
