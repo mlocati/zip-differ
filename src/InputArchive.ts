@@ -1,12 +1,13 @@
 import JSZip from 'jszip'
 import { formatSize } from './Size';
+import type { DownloadOptions } from './Downloader';
 
 export enum Origins
 {
     LocalComputer,
 }
 
-export type Origin = URL | Origins;
+export type Origin = DownloadOptions | Origins;
 
 function download(filename: string, data: ArrayBuffer): void
 {

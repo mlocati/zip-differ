@@ -1,16 +1,16 @@
-import { DefaultOptions, type Args, type Options } from "./Downloader";
+import { type DownloadOptions } from "./Downloader";
 
 const ALLOWREDIRECT_SUFFIX = 'redirect';
 const CREDENTIALS_SUFFIX = 'credentials';
 
-export function setDownloadUrl(prefix: string, args: Args|null): void
+export function setDownloadUrl(prefix: string, downloadOptions: DownloadOptions|null): void
 {
     const params = new URLSearchParams(document.location.search);
     const newParams: {[key: string]: string} = {};
-    const myPrefix = window.location.origin + window.location.pathname;
-    newParams[prefix] = args ? (args.url.href.startsWith(myPrefix) ? args.url.href.substring(myPrefix.length) : args.url.href) : '';
-    newParams[prefix + '.' + ALLOWREDIRECT_SUFFIX] = args?.options?.redirect === 'error' ? 'no' : '';
-    newParams[prefix + '.' + CREDENTIALS_SUFFIX] = !args?.options?.credentials || args.options.credentials === DefaultOptions.credentials ? '' : args.options.credentials;
+    const myPrefix = window.location.origin + window.location.pathname.replace(/\/[^\/]+$/, '/');
+    newParams[prefix] = downloadOptions ? (downloadOptions.url.href.startsWith(myPrefix) ? downloadOptions.url.href.substring(myPrefix.length) : downloadOptions.url.href) : '';
+    newParams[prefix + '.' + ALLOWREDIRECT_SUFFIX] = downloadOptions?.redirect === false ? 'no' : '';
+    newParams[prefix + '.' + CREDENTIALS_SUFFIX] = (downloadOptions?.credentials ?? 'same-origin') === 'same-origin' ? '' : downloadOptions!.credentials!;
     params.forEach((_, key) => {
         if (!newParams.hasOwnProperty(key)) {
             return;
@@ -30,7 +30,7 @@ export function setDownloadUrl(prefix: string, args: Args|null): void
     window.history.replaceState({}, '', `${document.location.pathname}?${params}`);
 }
 
-export function getDownloadUrl(prefix: string): Args|null
+export function getDownloadUrl(prefix: string): DownloadOptions|null
 {
     const params = new URLSearchParams(document.location.search);
     let url: URL|null = null;
@@ -47,12 +47,9 @@ export function getDownloadUrl(prefix: string): Args|null
         return null;
     }
     const rawCredentials: string = params.get(prefix + '.' + CREDENTIALS_SUFFIX) ?? '';
-    const options: Options = {
-        redirect: params.get(prefix + '.' + ALLOWREDIRECT_SUFFIX) === 'no' ? 'error' : 'follow',
-        credentials: ['include', 'omit', 'same-origin'].includes(rawCredentials) ? <RequestCredentials>rawCredentials : DefaultOptions.credentials!,
-    };
     return {
         url,
-        options,
+        redirect: params.get(prefix + '.' + ALLOWREDIRECT_SUFFIX) === 'no' ? false : true,
+        credentials: ['include', 'omit', 'same-origin'].includes(rawCredentials) ? <RequestCredentials>rawCredentials : 'same-origin',
     };
 }

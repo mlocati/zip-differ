@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, useId } from 'vue';
-import { DefaultOptions, type Args, type Options } from '../../../Downloader';
+import { type DownloadOptions } from '../../../Downloader';
 import * as bootstrap from 'bootstrap';
 
 const idPrefix = ref<string>(`zd-askurl-${useId()}`);
@@ -13,17 +13,18 @@ const allowRedirect = ref<boolean>(true);
 const credentials = ref<RequestCredentials>('same-origin');
 
 const emits = defineEmits<{
-  (e: 'ready', data: Args): void,
-}>()
+  (e: 'ready', data: DownloadOptions): void,
+}>();
+
 defineExpose({
   open,
 });
 
-function open(initialUrl?: string, options?: Options): void
+function open(options: DownloadOptions|null): void
 {
-  url.value = initialUrl || '';
-  allowRedirect.value = (options?.redirect || DefaultOptions.redirect!) === 'follow';
-  credentials.value = options?.credentials || DefaultOptions.credentials!;
+  url.value = options?.url.href || '';
+  allowRedirect.value = options?.redirect ?? true;
+  credentials.value = options?.credentials || 'same-origin';
   const el = modal.value;
   if (!el) {
     return;
@@ -39,14 +40,12 @@ function accept()
     return;
   }
   try {
-    const args: Args = {
+    const options: DownloadOptions = {
       url: new URL(url.value),
-      options: {
-        redirect: allowRedirect.value ? 'follow' : 'error',
-        credentials: credentials.value,
-      },
-    }
-    emits('ready', args);
+      redirect: allowRedirect.value,
+      credentials: credentials.value,
+    };
+    emits('ready', options);
     bootstrap.Modal.getInstance(modal.value)?.hide();
   } catch (e: Error|any) {
     window.alert(e?.message || e?.toString() || 'Unknown error');

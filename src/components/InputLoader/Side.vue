@@ -2,7 +2,7 @@
 import { computed, onMounted, ref, watch } from 'vue';
 import { readFile, readArrayBuffer, InputArchive } from '../../InputArchive';
 import Entry from './Side/Entry.vue';
-import { download, type Options } from '../../Downloader';
+import { download, type DownloadOptions } from '../../Downloader';
 import AskUrlModal from './Side/AskUrlModal.vue';
 import * as UrlService from '../../UrlService';
 
@@ -27,8 +27,17 @@ const emit = defineEmits<{
 }>()
 
 watch(inputArchive, (archive) => {
+    if (props.queryStringParam) {
+        UrlService.setDownloadUrl(props.queryStringParam, 'url' in { ...archive?.origin } ? <DownloadOptions>archive!.origin : null);
+    }
     emit('inputArchiveLoaded', archive);
 });
+
+function clear()
+{
+    inputArchive.value = null;
+    loadError.value = '';
+}
 
 async function loadFile(file: File) {
     loadError.value = '';
@@ -50,18 +59,6 @@ async function loadFile(file: File) {
     } finally {
         busyMessage.value = '';
     }
-    if (props.queryStringParam) {
-        UrlService.setDownloadUrl(props.queryStringParam, null);
-    }
-}
-
-function clear()
-{
-    inputArchive.value = null;
-    loadError.value = '';
-    if (props.queryStringParam) {
-        UrlService.setDownloadUrl(props.queryStringParam, null);
-    }
 }
 
 async function askUrl()
@@ -69,21 +66,17 @@ async function askUrl()
     if (busy.value) {
         return;
     }
-    const url = inputArchive?.value?.origin;
-    askUrlModal.value?.open(url instanceof URL ? url.toString() : '');
+    askUrlModal.value?.open('url' in { ...inputArchive.value?.origin } ? <DownloadOptions>inputArchive.value?.origin : null);
 }
 
-async function loadUrl(url: URL, options?: Options): Promise<boolean>
+async function loadUrl(options: DownloadOptions): Promise<boolean>
 {
     loadError.value = '';
     try {
-        busyMessage.value = `Downloading ${url}...`;
-        const {data, filename} = await download(url, options);
+        busyMessage.value = `Downloading ${options.url}...`;
+        const {data, filename} = await download(options);
         busyMessage.value = `Decompressing ${filename}...`;
-        inputArchive.value = await readArrayBuffer(filename!, data, url);
-        if (props.queryStringParam) {
-            UrlService.setDownloadUrl(props.queryStringParam, {url, options});
-        }
+        inputArchive.value = await readArrayBuffer(filename!, data, options);
         return true;
     }
     catch (e: Error|any) {
@@ -97,9 +90,6 @@ async function loadUrl(url: URL, options?: Options): Promise<boolean>
 function setInputArchive(zip: InputArchive|null)
 {
     inputArchive.value = zip;
-    if (props.queryStringParam) {
-        UrlService.setDownloadUrl(props.queryStringParam, null);
-    }
 }
 
 defineExpose({
@@ -134,9 +124,9 @@ onMounted(() => {
         loadFile(files[0]);
     });
     if (props.queryStringParam) {
-        const initialArgs = UrlService.getDownloadUrl(props.queryStringParam);
-        if (initialArgs) {
-            loadUrl(initialArgs.url, initialArgs.options);
+        const options = UrlService.getDownloadUrl(props.queryStringParam);
+        if (options) {
+            loadUrl(options);
         }
     }
 });
@@ -176,7 +166,7 @@ onMounted(() => {
             </ul>
         </main>
     </aside>
-    <AskUrlModal ref="askUrlModal" @ready="loadUrl($event.url, $event.options)" />
+    <AskUrlModal ref="askUrlModal" @ready="loadUrl($event)" />
 </template>
 
 <style lang="css" scoped>

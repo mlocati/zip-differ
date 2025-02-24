@@ -1,5 +1,8 @@
-export interface Options extends RequestInit
+export interface DownloadOptions
 {
+    url: URL,
+    redirect?: boolean,
+    credentials?: RequestCredentials,
     /**
      * The file extension to use when the filename cannot be extracted from the Content-Disposition response header:
      * This is extracted from the URL
@@ -7,12 +10,6 @@ export interface Options extends RequestInit
     fileExtension?: string;
 }
 
-export const DefaultOptions: Options = {
-    method: 'GET',
-    redirect: 'follow',
-    fileExtension: 'zip',
-    credentials: 'same-origin',
-};
 export interface DownloadResponse
 {
     data: ArrayBuffer;
@@ -22,18 +19,15 @@ export interface DownloadResponse
     filename?: string;
 }
 
-export interface Args
+export async function download(options: DownloadOptions): Promise<DownloadResponse>
 {
-    url: URL;
-    options?: Options;
-}
-
-export async function download(url: URL, options?: Options): Promise<DownloadResponse>
-{
-    options = structuredClone({ ...DefaultOptions, ...options });
+    const requestInit: RequestInit = {
+        method: 'GET',
+        redirect: options.redirect ? 'follow' : 'error',
+        credentials: options.credentials ?? 'same-origin',
+    };
     const fileExtension: string = options.fileExtension?.replace(/^\.+|\.+$/g, '') ?? '';
-    delete options.fileExtension;
-    const response = await fetch(url.href, options);
+    const response = await fetch(options.url, requestInit);
     if (!response.ok) {
         throw new Error(`Failed to download file: ${response.status} (${response.statusText})`);
     }
@@ -41,7 +35,7 @@ export async function download(url: URL, options?: Options): Promise<DownloadRes
     const match = response.headers.get('Content-Disposition')?.match(/^(.*?;)?\s*filename\s*=\s*"([^"]+)"/i);
     let filename: string | undefined = match ? match[2] : undefined;
     if (!filename && fileExtension !== '') {
-        filename = url.pathname.split('/').pop() || 'file';
+        filename = options.url.pathname.split('/').pop() || 'file';
         if (!filename.toLowerCase().endsWith(`.${fileExtension.toLowerCase()}`)) {
             filename += '.' + fileExtension;
         }
