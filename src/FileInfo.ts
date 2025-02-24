@@ -665,14 +665,20 @@ export function getDiffersFromFilename(
   return getDiffersFromExtension(extractExtensionFromFilename(filename));
 }
 
-/**
- * Remember to invoke URL.revokeObjectURL(...) when the image is no longer needed
- */
-export async function buildImageUrlFromData(
+export interface ImageInfo {
+  /**
+   * Remember to invoke URL.revokeObjectURL(...) when the image is no longer needed
+   */
+  url: string;
+  width: number;
+  height: number;
+}
+
+export async function inspectImageData(
   data: ArrayBuffer,
   options: {filename: string} | {extension: string} | {mimetype: string},
-): Promise<string> {
-  return new Promise<string>((resolve, reject) => {
+): Promise<ImageInfo> {
+  return new Promise<ImageInfo>((resolve, reject) => {
     let mimeType: string;
     if ('mimetype' in options) {
       mimeType = options.mimetype;
@@ -689,8 +695,10 @@ export async function buildImageUrlFromData(
     const url = URL.createObjectURL(blob);
     const img = document.createElement('img');
     img.onload = () => {
+      const width = img.naturalWidth;
+      const height = img.naturalHeight;
       document.body.removeChild(img);
-      resolve(url);
+      resolve({url, width, height});
     };
     img.onerror = () => {
       document.body.removeChild(img);

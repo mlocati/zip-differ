@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {onMounted, onUnmounted, ref, useId, watch} from 'vue';
 import {InputFile} from '../../InputArchive';
-import {buildImageUrlFromData} from '../../FileInfo';
+import {inspectImageData} from '../../FileInfo';
 
 const uniqueID = useId();
 
@@ -25,9 +25,10 @@ watch(imageSrc, (newImageSrc: string, oldImageSrc: string) => {
 async function loadImage(): Promise<void> {
   try {
     loadError.value = '';
-    imageSrc.value = await buildImageUrlFromData(props.inputFile.data, {
+    const info = await inspectImageData(props.inputFile.data, {
       filename: props.inputFile.name,
     });
+    imageSrc.value = info.url;
   } catch (e: Error | any) {
     imageSrc.value = '';
     loadError.value = e?.message || e?.toString() || 'Unknown error';
