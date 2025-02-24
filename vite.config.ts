@@ -1,5 +1,5 @@
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
+import {defineConfig} from 'vite';
+import vue from '@vitejs/plugin-vue';
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -7,14 +7,14 @@ export default defineConfig({
   css: {
     preprocessorOptions: {
       scss: {
-        quietDeps: true
-      }
-    }
+        quietDeps: true,
+      },
+    },
   },
   build: {
     outDir: 'docs',
     emptyOutDir: true,
     chunkSizeWarningLimit: 600,
   },
-  base: '/zip-differ/'
-})
+  base: '/zip-differ/',
+});

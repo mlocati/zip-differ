@@ -1,9 +1,9 @@
-declare module "boostrap";
+declare module 'boostrap';
 
 /**
  * @see https://image-compare-viewer.netlify.app/
  */
-declare module "image-compare-viewer" {
+declare module 'image-compare-viewer' {
   export interface ImageCompareOptions {
     // UI Theme Defaults
     /**
