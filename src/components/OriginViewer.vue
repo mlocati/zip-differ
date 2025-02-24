@@ -1,27 +1,22 @@
 <script setup lang="ts">
 import {computed} from 'vue';
 import {Origins, type Origin} from '../InputArchive';
-import {Tooltip} from 'bootstrap';
 
 const props = defineProps<{
   origin: Origin;
 }>();
 
-const isUrl = computed<boolean>(() => props.origin instanceof URL);
-
-const vBootstrapTooltip = {
-  mounted: (el: HTMLElement) => new Tooltip(el),
-};
+const isUrl = computed<boolean>(() => (<any>props.origin).url instanceof URL);
 </script>
 
 <template>
   <template v-if="isUrl">
     <a
-      :href="(<any>origin).href"
+      :href="(<any>origin).url.href"
       v-bootstrap-tooltip
-      :title="(<any>origin).href"
+      :title="(<any>origin).url.href"
       target="_blank"
-      >web</a
+      >URL</a
     >
   </template>
   <span v-else-if="origin === Origins.LocalComputer"> your computer </span>

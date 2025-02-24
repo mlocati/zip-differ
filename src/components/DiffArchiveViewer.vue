@@ -7,7 +7,6 @@ import {
   type DiffEntry,
 } from '../Differ';
 import {InputFile} from '../InputArchive';
-import {Tooltip} from 'bootstrap';
 import EventBus from '../EventBus';
 
 const uniqueID = useId();
@@ -80,10 +79,6 @@ function getEntryClasses(entry: DiffEntry): string {
   result.push(entry instanceof DiffFile ? 'diff-file' : 'diff-directory');
   return result.join(' ');
 }
-
-const vBootstrapTooltip = {
-  mounted: (el: HTMLElement) => new Tooltip(el),
-};
 
 function viewDiffFile(diffFile: DiffFile): void {
   EventBus.emit('viewDiffFile', diffFile);

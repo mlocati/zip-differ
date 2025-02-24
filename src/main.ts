@@ -3,6 +3,7 @@ import './style.scss';
 import App from './App.vue';
 import hljs from 'highlight.js/lib/core';
 import hljsVuePlugin from '@highlightjs/vue-plugin';
+import BootstrapTooltip from './directives/BootstrapTooltip';
 // highlight.js languages
 import asciidoc from 'highlight.js/lib/languages/asciidoc';
 import bash from 'highlight.js/lib/languages/bash';
@@ -60,4 +61,7 @@ hljs.registerLanguage('vbscript', vbscript);
 hljs.registerLanguage('xml', xml);
 hljs.registerLanguage('yaml', yaml);
 
-createApp(App).use(hljsVuePlugin).mount('#app');
+createApp(App)
+  .use(hljsVuePlugin)
+  .directive('bootstrap-tooltip', BootstrapTooltip)
+  .mount('#app');

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import {computed, onMounted, onUnmounted, ref, watch} from 'vue';
-import {Tooltip} from 'bootstrap';
 
 const button = ref<HTMLButtonElement>();
 const isModalFullscreen = ref<boolean>(false);
@@ -51,17 +50,7 @@ function listenModalHide(): void {
   }
 }
 
-const vBootstrapTooltip = {
-  mounted: (el: HTMLElement) => new Tooltip(el),
-};
-
-function hideTooltip(): void {
-  if (button.value) {
-    Tooltip.getInstance(button.value)?.hide();
-  }
-}
 onMounted(() => {
-  document.addEventListener('fullscreenchange', hideTooltip);
   const title = modalDialog.value?.querySelector(
     ':scope .modal-title',
   ) as HTMLElement;
@@ -73,7 +62,6 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  document.removeEventListener('fullscreenchange', hideTooltip);
   modal.value?.removeEventListener('show.bs.modal', listenModalShow);
   modal.value?.removeEventListener('hide.bs.modal', listenModalHide);
 });

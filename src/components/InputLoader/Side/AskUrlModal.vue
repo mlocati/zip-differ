@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {ref, useId} from 'vue';
 import {type DownloadOptions} from '../../../Downloader';
-import {Modal, Tooltip} from 'bootstrap';
+import {Modal} from 'bootstrap';
 
 const idPrefix = ref<string>(`zd-askurl-${useId()}`);
 
@@ -30,10 +30,6 @@ function open(options: DownloadOptions | null): void {
   }
   Modal.getOrCreateInstance(el).show();
 }
-
-const vBootstrapTooltip = {
-  mounted: (el: HTMLElement) => new Tooltip(el),
-};
 
 function accept() {
   if (!modal.value || !form.value?.checkValidity()) {
