@@ -23,7 +23,6 @@ watch(imageSrc, (newImageSrc: string, oldImageSrc: string) => {
 });
 
 async function loadImage(): Promise<void> {
-  debugger;
   try {
     loadError.value = '';
     imageSrc.value = await buildImageUrlFromData(props.inputFile.data, {
