@@ -18,27 +18,34 @@ function diffReady(diffArchive: DiffArchive): void {
 
 <template>
   <header>
-    <h1><a href="https://github.com/mlocati/zip-differ">Zip Differ</a></h1>
-    <div v-if="viewingDiff !== null">
-      <button class="btn btn-primary" @click.prevent="viewingDiff = null">
-        Close
-      </button>
-    </div>
-    <div v-else-if="inputLoader">
-      <button
-        class="btn btn-info me-2"
-        @click.prevent="inputLoader.swap()"
-        :disabled="!inputLoader.canSwap"
-      >
-        Swap
-      </button>
-      <button
-        class="btn btn-primary"
-        @click.prevent="inputLoader.compare()"
-        :disabled="!inputLoader.canCompare"
-      >
-        Compare
-      </button>
+    <h1>Zip Differ</h1>
+    <div>
+      <template v-if="viewingDiff !== null">
+        <button class="btn btn-primary" @click.prevent="viewingDiff = null">
+          Close
+        </button>
+      </template>
+      <template v-else>
+        <a target="_blank" href="https://github.com/mlocati/zip-differ">
+          <img src="/github.svg" />
+        </a>
+        <template v-if="inputLoader">
+          <button
+            class="btn btn-info ms-2"
+            @click.prevent="inputLoader.swap()"
+            :disabled="!inputLoader.canSwap"
+          >
+            Swap
+          </button>
+          <button
+            class="btn btn-primary ms-2"
+            @click.prevent="inputLoader.compare()"
+            :disabled="!inputLoader.canCompare"
+          >
+            Compare
+          </button>
+        </template>
+      </template>
     </div>
   </header>
   <InputLoader
@@ -61,8 +68,11 @@ header {
   align-items: center;
   padding: 0 10px;
 }
-header h1 a {
-  color: inherit;
-  text-decoration: none;
+header a img {
+  height: 1.67rem;
+  opacity: 0.5;
+}
+header a:hover img {
+  opacity: 1;
 }
 </style>
