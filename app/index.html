@@ -2,11 +2,20 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/zip-differ/zip-differ.svg" />
+    <link rel="icon" type="image/svg+xml" href="./images/zip-differ.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Diff Viewer</title>
-    <script type="module" crossorigin src="/zip-differ/assets/index-o9n-cGzt.js"></script>
-    <link rel="stylesheet" crossorigin href="/zip-differ/assets/index-B7QUSKUP.css">
+    <script>
+      (function () {
+        const url = new URL(window.location.href);
+        if (!url.pathname.match(/(\/|\.html?)$/i)) {
+          url.pathname += '/';
+          window.history.replaceState(null, '', url.toString());
+        }
+      })();
+    </script>
+    <script type="module" crossorigin src="./assets/index-BK3fJrMK.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-yV87aFZg.css">
   </head>
   <body>
     <div id="app"></div>
