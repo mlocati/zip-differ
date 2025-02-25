@@ -1,73 +1,76 @@
 <script setup lang="ts">
-import {onMounted, onUnmounted, ref, useId, watch} from 'vue';
+import {computed, onMounted, onUnmounted, ref, watch} from 'vue';
 import {InputFile} from '../../InputArchive';
-import {inspectImageData} from '../../FileInfo';
-
-const uniqueID = useId();
+import {inspectImageData, type ImageInfo} from '../../FileInfo';
+import type {ViewOptions} from '../ImageViewerOptions.vue';
+import ImageViewerOptions from '../ImageViewerOptions.vue';
 
 const props = defineProps<{
   inputFile: InputFile;
 }>();
 
-const checkerboardBackground = ref<boolean>(true);
+const viewOptions = ref<ViewOptions>({
+  zoomLevel: 1,
+  checkerboardBackground: true,
+});
 
-const imageSrc = ref<string>('');
+const imageInfo = ref<ImageInfo | null>(null);
 const loadError = ref<string>('');
 
 watch(props.inputFile, () => loadImage());
 
-watch(imageSrc, (newImageSrc: string, oldImageSrc: string) => {
-  if (oldImageSrc && oldImageSrc !== newImageSrc) {
-    URL.revokeObjectURL(oldImageSrc);
-  }
-});
+watch(
+  imageInfo,
+  (newImageInfo: ImageInfo | null, oldImageInfo: ImageInfo | null) => {
+    if (oldImageInfo?.url && oldImageInfo.url !== newImageInfo?.url) {
+      URL.revokeObjectURL(oldImageInfo.url);
+    }
+  },
+  {deep: true},
+);
 
 async function loadImage(): Promise<void> {
   try {
     loadError.value = '';
-    const info = await inspectImageData(props.inputFile.data, {
+    imageInfo.value = await inspectImageData(props.inputFile.data, {
       filename: props.inputFile.name,
     });
-    imageSrc.value = info.url;
   } catch (e: Error | any) {
-    imageSrc.value = '';
+    imageInfo.value = null;
     loadError.value = e?.message || e?.toString() || 'Unknown error';
   }
 }
 
+const imageStyle = computed<string>(() => {
+  if (!imageInfo.value) {
+    return '';
+  }
+  return `width: ${imageInfo.value.width * viewOptions.value.zoomLevel!}px; height: ${imageInfo.value.height * viewOptions.value.zoomLevel!}px`;
+});
 onMounted(() => {
   loadImage();
 });
 onUnmounted(() => {
-  imageSrc.value = '';
+  imageInfo.value = null;
 });
 </script>
 <template>
   <div v-if="loadError">
     <p class="alert alert-danger">Failed to load file: {{ loadError }}</p>
   </div>
-  <div v-else-if="imageSrc">
-    <div class="text-end">
-      <div class="form-check form-check-inline form-switch">
-        <input
-          class="form-check-input"
-          type="checkbox"
-          role="switch"
-          :id="`zd-td-checkerboard-background-${uniqueID}`"
-          v-model="checkerboardBackground"
-        />
-        <label
-          class="form-check-label"
-          :for="`zd-td-checkerboard-background-${uniqueID}`"
-          >Checkerboard background</label
-        >
+  <div v-else-if="imageInfo !== null">
+    <div class="row mb-3 justify-content-center">
+      <div class="col-6 align-self-end">
+        <ImageViewerOptions v-model="viewOptions" />
       </div>
     </div>
     <div
       class="img"
-      :class="checkerboardBackground ? 'zipdiffer-checkerboard' : ''"
+      :class="
+        viewOptions.checkerboardBackground ? 'zipdiffer-checkerboard' : ''
+      "
     >
-      <img :src="imageSrc" />
+      <img :src="imageInfo.url" :style="imageStyle" />
     </div>
   </div>
 </template>
@@ -77,5 +80,6 @@ onUnmounted(() => {
   border: 0.0625rem solid #3d444d;
   border-radius: 0.375rem !important;
   overflow: hidden;
+  text-align: center;
 }
 </style>

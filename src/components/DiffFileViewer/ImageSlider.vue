@@ -1,18 +1,10 @@
 <script setup lang="ts">
 import type {DiffFile} from '../../Differ';
-import {
-  computed,
-  ref,
-  nextTick,
-  onMounted,
-  onUnmounted,
-  useId,
-  watch,
-} from 'vue';
+import {computed, ref, nextTick, onMounted, onUnmounted, watch} from 'vue';
 import {type ImageInfo, inspectImageData} from '../../FileInfo';
 import ImageCompare from 'image-compare-viewer';
-
-const uniqueID = useId();
+import type {ViewOptions} from '../ImageViewerOptions.vue';
+import ImageViewerOptions from '../ImageViewerOptions.vue';
 
 const props = defineProps<{
   diffFile: DiffFile;
@@ -22,9 +14,10 @@ const leftInfo = ref<ImageInfo | null>(null);
 const rightInfo = ref<ImageInfo | null>(null);
 const loadError = ref<string>('');
 const images = ref<HTMLElement | null>(null);
-const checkerboardBackground = ref<boolean>(true);
-const ZOOM_LEVELS = ref<number[]>([0.1, 0.25, 0.5, 1, 1.5, 2, 5, 10]);
-const zoomLevel = ref<number>(1);
+const viewOptions = ref<ViewOptions>({
+  zoomLevel: 1,
+  checkerboardBackground: true,
+});
 
 watch(props.diffFile, () => loadImages());
 
@@ -43,8 +36,8 @@ const leftInfoDisplay = computed<ImageInfo | null>(() => {
   }
   return {
     ...leftInfo.value,
-    width: leftInfo.value.width * zoomLevel.value,
-    height: leftInfo.value.height * zoomLevel.value,
+    width: leftInfo.value.width * viewOptions.value.zoomLevel!,
+    height: leftInfo.value.height * viewOptions.value.zoomLevel!,
   };
 });
 const rightInfoDisplay = computed<ImageInfo | null>(() => {
@@ -53,8 +46,8 @@ const rightInfoDisplay = computed<ImageInfo | null>(() => {
   }
   return {
     ...rightInfo.value,
-    width: rightInfo.value.width * zoomLevel.value,
-    height: rightInfo.value.height * zoomLevel.value,
+    width: rightInfo.value.width * viewOptions.value.zoomLevel!,
+    height: rightInfo.value.height * viewOptions.value.zoomLevel!,
   };
 });
 
@@ -136,33 +129,14 @@ onUnmounted(() => {
   <div v-else-if="leftInfoDisplay && rightInfoDisplay">
     <div class="row mb-3 justify-content-center">
       <div class="col-6 align-self-end">
-        <div class="input-group">
-          <span class="input-group-text" id="basic-addon1">Zoom</span>
-          <select class="form-control" v-model="zoomLevel">
-            <option v-for="zl in ZOOM_LEVELS" :value="zl">{{ zl }}x</option>
-          </select>
-          <div class="input-group-text">
-            <div class="form-check form-check-inline form-switch">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                role="switch"
-                :id="`zd-td-slider-checkerboard-background-${uniqueID}`"
-                v-model="checkerboardBackground"
-              />
-              <label
-                class="form-check-label"
-                :for="`zd-td-slider-checkerboard-background-${uniqueID}`"
-                >Checkerboard background</label
-              >
-            </div>
-          </div>
-        </div>
+        <ImageViewerOptions v-model="viewOptions" />
       </div>
     </div>
     <div
       ref="images"
-      :class="checkerboardBackground ? 'zipdiffer-checkerboard' : ''"
+      :class="
+        viewOptions.checkerboardBackground ? 'zipdiffer-checkerboard' : ''
+      "
       style="margin: auto"
       :style="{
         width: `${leftInfoDisplay.width || 0 + rightInfoDisplay.width || 0}px`,
