@@ -16,5 +16,5 @@ export default defineConfig({
     emptyOutDir: true,
     chunkSizeWarningLimit: 600,
   },
-  base: '/zip-differ/',
+  base: './',
 });
