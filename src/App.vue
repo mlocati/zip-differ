@@ -27,7 +27,7 @@ function diffReady(diffArchive: DiffArchive): void {
       </template>
       <template v-else>
         <a target="_blank" href="https://github.com/mlocati/zip-differ">
-          <img src="/github.svg" />
+          <img src="/images/github.svg" />
         </a>
         <template v-if="inputLoader">
           <button
