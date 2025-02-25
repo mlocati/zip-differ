@@ -12,7 +12,7 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: 'docs',
+    outDir: 'app',
     emptyOutDir: true,
     chunkSizeWarningLimit: 600,
   },

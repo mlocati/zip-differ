@@ -36,9 +36,9 @@ async function createZip(relativeSourceDir, zipName, tempDir) {
         fs.mkdirSync(absoluteTargetDir, {recursive: true});
       }
       if (!fs.existsSync(absoluteTargetFile)) {
-        const docsTargetFile = PROJECT_ROOT + '/docs/sample-data/' + zipName;
-        if (fs.existsSync(docsTargetFile)) {
-          fs.copyFileSync(docsTargetFile, absoluteTargetFile);
+        const appTargetFile = PROJECT_ROOT + '/app/sample-data/' + zipName;
+        if (fs.existsSync(appTargetFile)) {
+          fs.copyFileSync(appTargetFile, absoluteTargetFile);
         }
       }
       const zip = new JSZip();
