@@ -2,19 +2,15 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <script>
+      if (!/(\/|\.html?)$/i.test(window.location.pathname)) {
+        window.location.pathname += '/';
+      }
+    </script>
     <link rel="icon" type="image/svg+xml" href="./images/zip-differ.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Diff Viewer</title>
-    <script>
-      (function () {
-        const url = new URL(window.location.href);
-        if (!url.pathname.match(/(\/|\.html?)$/i)) {
-          url.pathname += '/';
-          window.history.replaceState(null, '', url.toString());
-        }
-      })();
-    </script>
-    <script type="module" crossorigin src="./assets/index-BK3fJrMK.js"></script>
+    <script type="module" crossorigin src="./assets/index-KvXdWMWC.js"></script>
     <link rel="stylesheet" crossorigin href="./assets/index-yV87aFZg.css">
   </head>
   <body>
