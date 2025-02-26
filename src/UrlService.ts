@@ -38,10 +38,17 @@ export function setDownloadUrl(
       params.set(key, newParams[key]);
     }
   }
+  const sortedParams = new URLSearchParams();
+  [...params.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .forEach(([key, value]) => sortedParams.append(key, value));
+  const serializedParams = sortedParams.toString().replace(/%2F/g, '/');
   window.history.replaceState(
     {},
     '',
-    `${document.location.pathname}?${params}`,
+    serializedParams === ''
+      ? document.location.pathname
+      : `${document.location.pathname}?${serializedParams}`,
   );
 }
 
