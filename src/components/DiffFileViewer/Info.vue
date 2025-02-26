@@ -38,7 +38,7 @@ defineProps<{
         </td>
       </tr>
       <tr>
-        <th>Full Path</th>
+        <th>Path in archive</th>
         <td>
           <code>{{ diffFile.left!.path }}</code>
         </td>

@@ -27,7 +27,7 @@ defineProps<{
         </td>
       </tr>
       <tr>
-        <th>Path in Archive</th>
+        <th>Path in archive</th>
         <td>
           <code>{{ inputFile.path }}</code>
         </td>
