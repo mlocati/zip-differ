@@ -168,25 +168,12 @@ interface ExtensionInfo {
 }
 
 const EXTENSIONS: Record<string, ExtensionInfo> = {
-  adoc: {
-    text: {
-      highlightjsLanguage: HighlightjsLanguages.AsciiDoc,
-      differs: COMMON_DIFFERS,
-    },
-  },
   apng: {
     image: {mimeType: 'image/apng'},
   },
   asciidoc: {
     text: {
       highlightjsLanguage: HighlightjsLanguages.AsciiDoc,
-      differs: COMMON_DIFFERS,
-    },
-  },
-  atom: {
-    text: {
-      highlightjsLanguage: HighlightjsLanguages.XML,
-      formatter: FORMATTERS.XML,
       differs: COMMON_DIFFERS,
     },
   },
@@ -214,12 +201,6 @@ const EXTENSIONS: Record<string, ExtensionInfo> = {
       differs: COMMON_DIFFERS,
     },
   },
-  cmd: {
-    text: {
-      highlightjsLanguage: HighlightjsLanguages.DOS,
-      differs: COMMON_DIFFERS,
-    },
-  },
   cpp: {
     text: {
       highlightjsLanguage: HighlightjsLanguages.CPP,
@@ -239,56 +220,11 @@ const EXTENSIONS: Record<string, ExtensionInfo> = {
       differs: [DIFFERS.CSS, ...COMMON_DIFFERS],
     },
   },
-  cjs: {
-    text: {
-      highlightjsLanguage: HighlightjsLanguages.JavaScript,
-      formatter: FORMATTERS.JavaScript,
-      differs: COMMON_DIFFERS,
-    },
-  },
-  cts: {
-    text: {
-      highlightjsLanguage: HighlightjsLanguages.TypeScript,
-      differs: COMMON_DIFFERS,
-    },
-  },
-  cur: {
-    image: {mimeType: 'image/x-icon'},
-  },
-  diff: {
-    text: {
-      highlightjsLanguage: HighlightjsLanguages.Diff,
-      differs: COMMON_DIFFERS,
-    },
-  },
   gif: {
     image: {mimeType: 'image/gif'},
   },
-  gyp: {
-    text: {
-      highlightjsLanguage: HighlightjsLanguages.Python,
-      differs: COMMON_DIFFERS,
-    },
-  },
-  h: {
-    text: {
-      highlightjsLanguage: HighlightjsLanguages.C,
-      differs: COMMON_DIFFERS,
-    },
-  },
-  heic: {
-    // UNSUPPORTED BY BROWSERS image: {mimeType: 'image/heic'},
-  },
-  heif: {
-    // UNSUPPORTED BY BROWSERS image: {mimeType: 'image/heif'},
-  },
-  htm: {
-    text: {
-      highlightjsLanguage: HighlightjsLanguages.XML,
-      formatter: FORMATTERS.Html,
-      differs: COMMON_DIFFERS,
-    },
-  },
+  // heic: UNSUPPORTED BY BROWSERS image: {mimeType: 'image/heic'}
+  // heif: UNSUPPORTED BY BROWSERS image: {mimeType: 'image/heif'}
   html: {
     text: {
       highlightjsLanguage: HighlightjsLanguages.XML,
@@ -298,12 +234,6 @@ const EXTENSIONS: Record<string, ExtensionInfo> = {
   },
   ico: {
     image: {mimeType: 'image/x-icon'},
-  },
-  jfif: {
-    image: {mimeType: 'image/jpeg'},
-  },
-  jpeg: {
-    image: {mimeType: 'image/jpeg'},
   },
   jpg: {
     image: {mimeType: 'image/jpeg'},
@@ -321,21 +251,9 @@ const EXTENSIONS: Record<string, ExtensionInfo> = {
       differs: [DIFFERS.JSON, ...COMMON_DIFFERS],
     },
   },
-  jsonc: {
-    text: {
-      highlightjsLanguage: HighlightjsLanguages.JSON,
-      differs: [DIFFERS.JSON, ...COMMON_DIFFERS],
-    },
-  },
   less: {
     text: {
       highlightjsLanguage: HighlightjsLanguages.Less,
-      differs: COMMON_DIFFERS,
-    },
-  },
-  markdown: {
-    text: {
-      highlightjsLanguage: HighlightjsLanguages.Markdown,
       differs: COMMON_DIFFERS,
     },
   },
@@ -345,40 +263,9 @@ const EXTENSIONS: Record<string, ExtensionInfo> = {
       differs: COMMON_DIFFERS,
     },
   },
-  mjs: {
-    text: {
-      highlightjsLanguage: HighlightjsLanguages.JavaScript,
-      formatter: FORMATTERS.JavaScript,
-      differs: COMMON_DIFFERS,
-    },
-  },
-  mkd: {
-    text: {
-      highlightjsLanguage: HighlightjsLanguages.Markdown,
-      differs: COMMON_DIFFERS,
-    },
-  },
-  mkdown: {
-    text: {
-      highlightjsLanguage: HighlightjsLanguages.Markdown,
-      differs: COMMON_DIFFERS,
-    },
-  },
-  mts: {
-    text: {
-      highlightjsLanguage: HighlightjsLanguages.TypeScript,
-      differs: COMMON_DIFFERS,
-    },
-  },
   patch: {
     text: {
       highlightjsLanguage: HighlightjsLanguages.Diff,
-      differs: COMMON_DIFFERS,
-    },
-  },
-  perl: {
-    text: {
-      highlightjsLanguage: HighlightjsLanguages.Perl,
       differs: COMMON_DIFFERS,
     },
   },
@@ -388,19 +275,7 @@ const EXTENSIONS: Record<string, ExtensionInfo> = {
       differs: COMMON_DIFFERS,
     },
   },
-  pjp: {
-    image: {mimeType: 'image/jpeg'},
-  },
-  pjpeg: {
-    image: {mimeType: 'image/jpeg'},
-  },
   pl: {
-    text: {
-      highlightjsLanguage: HighlightjsLanguages.Perl,
-      differs: COMMON_DIFFERS,
-    },
-  },
-  pm: {
     text: {
       highlightjsLanguage: HighlightjsLanguages.Perl,
       differs: COMMON_DIFFERS,
@@ -415,18 +290,6 @@ const EXTENSIONS: Record<string, ExtensionInfo> = {
       differs: COMMON_DIFFERS,
     },
   },
-  pot: {
-    text: {
-      highlightjsLanguage: HighlightjsLanguages.PO,
-      differs: COMMON_DIFFERS,
-    },
-  },
-  ps: {
-    text: {
-      highlightjsLanguage: HighlightjsLanguages.PowerShell,
-      differs: COMMON_DIFFERS,
-    },
-  },
   ps1: {
     text: {
       highlightjsLanguage: HighlightjsLanguages.PowerShell,
@@ -434,12 +297,6 @@ const EXTENSIONS: Record<string, ExtensionInfo> = {
     },
   },
   py: {
-    text: {
-      highlightjsLanguage: HighlightjsLanguages.Python,
-      differs: COMMON_DIFFERS,
-    },
-  },
-  python: {
     text: {
       highlightjsLanguage: HighlightjsLanguages.Python,
       differs: COMMON_DIFFERS,
@@ -457,41 +314,10 @@ const EXTENSIONS: Record<string, ExtensionInfo> = {
       differs: COMMON_DIFFERS,
     },
   },
-  rss: {
-    text: {
-      highlightjsLanguage: HighlightjsLanguages.XML,
-      formatter: FORMATTERS.XML,
-      differs: COMMON_DIFFERS,
-    },
-  },
-  ruby: {
-    text: {
-      highlightjsLanguage: HighlightjsLanguages.Ruby,
-      differs: COMMON_DIFFERS,
-    },
-  },
-  rust: {
-    text: {
-      highlightjsLanguage: HighlightjsLanguages.Rust,
-      differs: COMMON_DIFFERS,
-    },
-  },
-  sass: {
-    text: {
-      highlightjsLanguage: HighlightjsLanguages.SCSS,
-      differs: [DIFFERS.CSS, ...COMMON_DIFFERS],
-    },
-  },
   scss: {
     text: {
       highlightjsLanguage: HighlightjsLanguages.SCSS,
       differs: [DIFFERS.CSS, ...COMMON_DIFFERS],
-    },
-  },
-  sh: {
-    text: {
-      highlightjsLanguage: HighlightjsLanguages.Bash,
-      differs: COMMON_DIFFERS,
     },
   },
   sql: {
@@ -508,19 +334,8 @@ const EXTENSIONS: Record<string, ExtensionInfo> = {
       differs: COMMON_DIFFERS,
     },
   },
-  tif: {
-    // UNSUPPORTED BY BROWSERS image: {mimeType: 'image/tiff'},
-  },
-  tiff: {
-    // UNSUPPORTED BY BROWSERS image: {mimeType: 'image/tiff'},
-  },
+  // tiff: UNSUPPORTED BY BROWSERS image: {mimeType: 'image/tiff'}
   ts: {
-    text: {
-      highlightjsLanguage: HighlightjsLanguages.TypeScript,
-      differs: COMMON_DIFFERS,
-    },
-  },
-  tsx: {
     text: {
       highlightjsLanguage: HighlightjsLanguages.TypeScript,
       differs: COMMON_DIFFERS,
@@ -544,19 +359,7 @@ const EXTENSIONS: Record<string, ExtensionInfo> = {
       differs: COMMON_DIFFERS,
     },
   },
-  vba: {
-    text: {
-      highlightjsLanguage: HighlightjsLanguages.VBScript,
-      differs: COMMON_DIFFERS,
-    },
-  },
   vbs: {
-    text: {
-      highlightjsLanguage: HighlightjsLanguages.VBScript,
-      differs: COMMON_DIFFERS,
-    },
-  },
-  vbscript: {
     text: {
       highlightjsLanguage: HighlightjsLanguages.VBScript,
       differs: COMMON_DIFFERS,
@@ -565,37 +368,10 @@ const EXTENSIONS: Record<string, ExtensionInfo> = {
   webp: {
     image: {mimeType: 'image/webp'},
   },
-  xhtml: {
-    text: {
-      highlightjsLanguage: HighlightjsLanguages.XML,
-      formatter: FORMATTERS.Html,
-      differs: COMMON_DIFFERS,
-    },
-  },
   xml: {
     text: {
       highlightjsLanguage: HighlightjsLanguages.XML,
       formatter: FORMATTERS.XML,
-      differs: COMMON_DIFFERS,
-    },
-  },
-  xsd: {
-    text: {
-      highlightjsLanguage: HighlightjsLanguages.XML,
-      formatter: FORMATTERS.XML,
-      differs: COMMON_DIFFERS,
-    },
-  },
-  xsl: {
-    text: {
-      highlightjsLanguage: HighlightjsLanguages.XML,
-      formatter: FORMATTERS.XML,
-      differs: COMMON_DIFFERS,
-    },
-  },
-  yaml: {
-    text: {
-      highlightjsLanguage: HighlightjsLanguages.Yaml,
       differs: COMMON_DIFFERS,
     },
   },
@@ -605,18 +381,67 @@ const EXTENSIONS: Record<string, ExtensionInfo> = {
       differs: COMMON_DIFFERS,
     },
   },
-  zsh: {
-    text: {
-      highlightjsLanguage: HighlightjsLanguages.Bash,
-      differs: COMMON_DIFFERS,
-    },
-  },
+};
+
+const EXTENSION_ALIASES: Record<string, keyof typeof EXTENSIONS> = {
+  adoc: 'asciidoc',
+  atom: 'xml',
+  cjs: 'js',
+  cmd: 'bat',
+  cts: 'ts',
+  cur: 'ico',
+  diff: 'patch',
+  gyp: 'py',
+  h: 'c',
+  htm: 'html',
+  jfif: 'jpg',
+  jpeg: 'jpg',
+  jsonc: 'json',
+  markdown: 'md',
+  mjs: 'js',
+  mkd: 'md',
+  mkdown: 'md',
+  mts: 'ts',
+  perl: 'pl',
+  pjp: 'jpg',
+  pjpeg: 'jpg',
+  pm: 'pl',
+  pot: 'po',
+  ps: 'ps1',
+  python: 'py',
+  rss: 'xml',
+  ruby: 'rb',
+  rust: 'rs',
+  sass: 'scss',
+  sh: 'bash',
+  // tif: 'tiff',
+  tsx: 'ts',
+  vba: 'vbs',
+  vbscript: 'vbs',
+  xhtml: 'html',
+  xsd: 'xml',
+  xsl: 'xml',
+  yaml: 'yml',
+  zsh: 'bash',
 };
 
 function getExtensionInfoFromExtension(
   extension: string,
 ): ExtensionInfo | null {
-  return EXTENSIONS[extension.toLowerCase()] ?? null;
+  extension = extension.toLowerCase();
+  if (EXTENSIONS.hasOwnProperty(extension)) {
+    return EXTENSIONS[extension];
+  }
+  let aliasOf = EXTENSION_ALIASES[extension];
+  if (aliasOf === undefined) {
+    return null;
+  }
+  if (!EXTENSIONS.hasOwnProperty(aliasOf)) {
+    throw new Error(
+      `Invalid extension mapping: ${extension} is a alias of ${aliasOf}, but ${aliasOf} is not defined`,
+    );
+  }
+  return EXTENSIONS[aliasOf];
 }
 
 function extractExtensionFromFilename(filename: string): string {
