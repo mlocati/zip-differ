@@ -24,6 +24,7 @@ enum HighlightjsLanguages {
   Markdown = 'markdown',
   Perl = 'perl',
   PHP = 'php',
+  PO = 'po',
   PowerShell = 'powershell',
   Python = 'python',
   Ruby = 'ruby',
@@ -407,6 +408,18 @@ const EXTENSIONS: Record<string, ExtensionInfo> = {
   },
   png: {
     image: {mimeType: 'image/png'},
+  },
+  po: {
+    text: {
+      highlightjsLanguage: HighlightjsLanguages.PO,
+      differs: COMMON_DIFFERS,
+    },
+  },
+  pot: {
+    text: {
+      highlightjsLanguage: HighlightjsLanguages.PO,
+      differs: COMMON_DIFFERS,
+    },
   },
   ps: {
     text: {

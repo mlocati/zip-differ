@@ -4,7 +4,7 @@ import App from './App.vue';
 import hljs from 'highlight.js/lib/core';
 import hljsVuePlugin from '@highlightjs/vue-plugin';
 import BootstrapTooltip from './directives/BootstrapTooltip';
-// highlight.js languages
+// highlight.js default languages
 import asciidoc from 'highlight.js/lib/languages/asciidoc';
 import bash from 'highlight.js/lib/languages/bash';
 import c from 'highlight.js/lib/languages/c';
@@ -32,7 +32,10 @@ import vbnet from 'highlight.js/lib/languages/vbnet';
 import vbscript from 'highlight.js/lib/languages/vbscript';
 import xml from 'highlight.js/lib/languages/xml';
 import yaml from 'highlight.js/lib/languages/yaml';
+// highlight.js custom languages
+import po from './highlight.js/po';
 
+// See https://github.com/highlightjs/highlight.js/blob/main/SUPPORTED_LANGUAGES.md
 hljs.registerLanguage('asciidoc', asciidoc);
 hljs.registerLanguage('bash', bash);
 hljs.registerLanguage('c', c);
@@ -60,6 +63,8 @@ hljs.registerLanguage('vbnet', vbnet);
 hljs.registerLanguage('vbscript', vbscript);
 hljs.registerLanguage('xml', xml);
 hljs.registerLanguage('yaml', yaml);
+// See https://highlightjs.readthedocs.io/en/latest/language-guide.html
+hljs.registerLanguage('po', po);
 
 createApp(App)
   .use(hljsVuePlugin)
