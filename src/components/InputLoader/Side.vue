@@ -173,7 +173,15 @@ onMounted(() => {
                 href="#"
                 :class="{disabled: busy || inputArchive === null}"
                 @click.prevent.stop="clear()"
-                ><span class="text-danger">&#128473;</span> Clear</a
+                ><span
+                  :class="
+                    busy || inputArchive === null
+                      ? 'text-secondary'
+                      : 'text-danger'
+                  "
+                  >&#x1F5D9;</span
+                >
+                Close</a
               >
             </li>
           </ul>
