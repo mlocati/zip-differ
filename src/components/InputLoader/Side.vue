@@ -123,11 +123,15 @@ onMounted(() => {
       return;
     }
     loadError.value = '';
-    fileInput.value!.value = '';
     if (files.length !== 1) {
       loadError.value = 'Please select only one file';
+      fileInput.value!.value = '';
+      return;
     }
     loadFile(files[0]);
+    setTimeout(() => {
+      fileInput.value!.value = '';
+    }, 500);
   });
   if (props.queryStringParam) {
     const options = UrlService.getDownloadUrl(props.queryStringParam);
