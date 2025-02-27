@@ -2,9 +2,14 @@
 import {computed, onMounted, ref, watch} from 'vue';
 import {readFile, readArrayBuffer, InputArchive} from '../../InputArchive';
 import Entry from './Side/Entry.vue';
-import {download, type DownloadOptions} from '../../Downloader';
+import {
+  download,
+  type DownloadOptions,
+  type DownloadProgress,
+} from '../../Downloader';
 import AskUrlModal from './Side/AskUrlModal.vue';
 import * as UrlService from '../../UrlService';
+import {formatSize} from '../../Size';
 
 const dropArea = ref<HTMLElement>();
 const fileInput = ref<HTMLInputElement>();
@@ -13,6 +18,20 @@ const loadError = ref<string>('');
 const busy = computed<boolean>(() => busyMessage.value.length !== 0);
 const inputArchive = ref<InputArchive | null>(null);
 const askUrlModal = ref<InstanceType<typeof AskUrlModal>>();
+const downloadProgress = ref<DownloadProgress | null>(null);
+const downloadProgressText = computed<string>(() => {
+  if (downloadProgress.value === null) {
+    return '';
+  }
+  if (downloadProgress.value.total === null) {
+    return `${formatSize(downloadProgress.value.downloaded)} downloaded`;
+  }
+  const perc = (
+    (100 * downloadProgress.value.downloaded) /
+    downloadProgress.value.total
+  ).toFixed(1);
+  return `${perc}% (${formatSize(downloadProgress.value.downloaded)} / ${formatSize(downloadProgress.value.total)})`;
+});
 let abortDownloadController: AbortController | null = null;
 const abortDownloadRequested = ref<boolean | null>(null);
 
@@ -80,7 +99,7 @@ async function askUrl() {
   );
 }
 
-async function loadUrl(options: DownloadOptions): Promise<boolean> {
+async function loadUrl(options: DownloadOptions): Promise<void> {
   loadError.value = '';
   abortDownloadController = new AbortController();
   abortDownloadRequested.value = false;
@@ -89,18 +108,24 @@ async function loadUrl(options: DownloadOptions): Promise<boolean> {
     const {data, filename} = await download(
       options,
       abortDownloadController.signal,
+      (progress: DownloadProgress) => {
+        downloadProgress.value = progress;
+      },
     );
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    downloadProgress.value = null;
+    abortDownloadRequested.value = null;
     busyMessage.value = `Decompressing ${filename}...`;
+    await new Promise((resolve) => setTimeout(resolve, 100));
     inputArchive.value = await readArrayBuffer(filename!, data, options);
-    return true;
   } catch (e: Error | any) {
     if (e?.name === 'AbortError' && abortDownloadController.signal.aborted) {
       loadError.value = '';
     } else {
       loadError.value = e?.message || e?.toString() || 'Unknown error';
     }
-    return false;
   } finally {
+    downloadProgress.value = null;
     abortDownloadController = null;
     abortDownloadRequested.value = null;
     busyMessage.value = '';
@@ -208,9 +233,25 @@ onMounted(() => {
     </nav>
     <main v-if="busy" class="message">
       {{ busyMessage }}
+      <template v-if="downloadProgress !== null">
+        <div
+          v-if="downloadProgress.total !== null"
+          class="progress mt-2"
+          role="progressbar"
+          :title="downloadProgressText"
+        >
+          <div
+            class="progress-bar"
+            :style="`width: ${(100 * downloadProgress.downloaded) / downloadProgress.total}%`"
+          >
+            {{ downloadProgressText }}
+          </div>
+        </div>
+        <div v-else class="mt-2">{{ downloadProgressText }}</div>
+      </template>
       <div v-if="abortDownloadRequested !== null">
         <button
-          class="btn btn-danger"
+          class="btn btn-danger mt-2"
           :disabled="abortDownloadRequested === true"
           @click.prevent="abortDownload()"
         >
@@ -264,6 +305,10 @@ aside > main.message {
   justify-content: center;
   align-items: center;
   flex-direction: column;
+}
+aside > main.message > .progress {
+  width: 100%;
+  max-width: 300px;
 }
 aside > footer {
   padding: 0.5em;
