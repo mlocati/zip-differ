@@ -13,6 +13,8 @@ const loadError = ref<string>('');
 const busy = computed<boolean>(() => busyMessage.value.length !== 0);
 const inputArchive = ref<InputArchive | null>(null);
 const askUrlModal = ref<InstanceType<typeof AskUrlModal>>();
+let abortDownloadController: AbortController | null = null;
+const abortDownloadRequested = ref<boolean | null>(null);
 
 const props = defineProps({
   queryStringParam: {
@@ -80,18 +82,34 @@ async function askUrl() {
 
 async function loadUrl(options: DownloadOptions): Promise<boolean> {
   loadError.value = '';
+  abortDownloadController = new AbortController();
+  abortDownloadRequested.value = false;
   try {
     busyMessage.value = `Downloading ${options.url}...`;
-    const {data, filename} = await download(options);
+    const {data, filename} = await download(
+      options,
+      abortDownloadController.signal,
+    );
     busyMessage.value = `Decompressing ${filename}...`;
     inputArchive.value = await readArrayBuffer(filename!, data, options);
     return true;
   } catch (e: Error | any) {
-    loadError.value = e?.message || e?.toString() || 'Unknown error';
+    if (e?.name === 'AbortError' && abortDownloadController.signal.aborted) {
+      loadError.value = '';
+    } else {
+      loadError.value = e?.message || e?.toString() || 'Unknown error';
+    }
     return false;
   } finally {
+    abortDownloadController = null;
+    abortDownloadRequested.value = null;
     busyMessage.value = '';
   }
+}
+
+function abortDownload(): void {
+  abortDownloadRequested.value = true;
+  abortDownloadController?.abort('Download aborted');
 }
 
 function setInputArchive(zip: InputArchive | null) {
@@ -190,6 +208,15 @@ onMounted(() => {
     </nav>
     <main v-if="busy" class="message">
       {{ busyMessage }}
+      <div v-if="abortDownloadRequested !== null">
+        <button
+          class="btn btn-danger"
+          :disabled="abortDownloadRequested === true"
+          @click.prevent="abortDownload()"
+        >
+          Abort
+        </button>
+      </div>
     </main>
     <main
       v-else-if="inputArchive === null"
@@ -236,6 +263,7 @@ aside > main {
 aside > main.message {
   justify-content: center;
   align-items: center;
+  flex-direction: column;
 }
 aside > footer {
   padding: 0.5em;

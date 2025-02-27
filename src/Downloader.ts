@@ -19,12 +19,16 @@ export interface DownloadResponse {
 
 export async function download(
   options: DownloadOptions,
+  abortSignal?: AbortSignal,
 ): Promise<DownloadResponse> {
   const requestInit: RequestInit = {
     method: 'GET',
     redirect: options.redirect ? 'follow' : 'error',
     credentials: options.credentials ?? 'same-origin',
   };
+  if (abortSignal) {
+    requestInit.signal = abortSignal;
+  }
   const fileExtension: string =
     options.fileExtension.replace(/^\.+|\.+$/g, '') ?? '';
   const response = await fetch(options.url, requestInit);
