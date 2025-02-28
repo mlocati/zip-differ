@@ -2,14 +2,18 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <title>Diff Viewer</title>
     <script>
-      if (!/(\/|\.html?)$/i.test(window.location.pathname)) {
-        window.location.pathname += '/';
-      }
+      (function () {
+        const url = new URL(window.location.href);
+        if (!/(\/|\.html?)$/i.test(url.pathname)) {
+          url.pathname += '/';
+          window.history.replaceState(null, '', url.href);
+        }
+      })();
     </script>
     <link rel="icon" type="image/svg+xml" href="/images/zip-differ.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Diff Viewer</title>
   </head>
   <body>
     <div id="app"></div>
