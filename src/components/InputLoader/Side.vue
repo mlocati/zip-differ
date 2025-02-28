@@ -148,7 +148,17 @@ defineExpose({
 onMounted(() => {
   dropArea.value?.addEventListener('dragover', (e) => {
     e.preventDefault();
-    dropArea.value?.classList.add('dragover');
+    const nItems = e.dataTransfer?.items?.length || 0;
+    if (nItems === 1) {
+      for (let i = 0; i < nItems; i++) {
+        if (e.dataTransfer!.items[i].kind === 'file') {
+          e.dataTransfer!.dropEffect = 'copy';
+          dropArea.value?.classList.add('dragover');
+          return;
+        }
+      }
+    }
+    e.dataTransfer!.dropEffect = 'none';
   });
   dropArea.value?.addEventListener('dragleave', () => {
     dropArea.value?.classList.remove('dragover');
