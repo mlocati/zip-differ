@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, ref} from 'vue';
+import {computed, ref, watch} from 'vue';
 import Side from './InputLoader/Side.vue';
 import {InputArchive} from '../InputArchive';
 import {DiffArchive} from '../Differ';
@@ -17,6 +17,16 @@ const leftSide = ref<typeof Side>();
 const leftArchive = ref<InputArchive | null>(null);
 const rightSide = ref<typeof Side>();
 const rightArchive = ref<InputArchive | null>(null);
+const numSidesLoaded = ref<number>(0);
+
+watch(numSidesLoaded, (num) => {
+  if (num === 2 && leftArchive.value !== null && rightArchive.value !== null) {
+    const params = new URLSearchParams(document.location.search);
+    if (params.get('autocompare') === 'yes') {
+      compare();
+    }
+  }
+});
 
 function setInputArchive(zip: InputArchive | null, side: Sides): void {
   switch (side) {
@@ -73,11 +83,13 @@ defineExpose({
       ref="leftSide"
       queryStringParam="left"
       @inputArchiveLoaded="setInputArchive($event, Sides.Left)"
+      @ready="numSidesLoaded++"
     />
     <Side
       ref="rightSide"
       queryStringParam="right"
       @inputArchiveLoaded="setInputArchive($event, Sides.Right)"
+      @ready="numSidesLoaded++"
     />
   </section>
 </template>

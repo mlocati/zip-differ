@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, onMounted, ref, watch} from 'vue';
+import {computed, nextTick, onMounted, ref, watch} from 'vue';
 import {readFile, readArrayBuffer, InputArchive} from '../../InputArchive';
 import Entry from './Side/Entry.vue';
 import {
@@ -45,6 +45,7 @@ const props = defineProps({
 
 const emit = defineEmits<{
   (e: 'inputArchiveLoaded', inputArchive: InputArchive | null): void;
+  (e: 'ready'): void;
 }>();
 
 watch(inputArchive, (archive) => {
@@ -145,7 +146,7 @@ defineExpose({
   setInputArchive,
 });
 
-onMounted(() => {
+onMounted(async () => {
   dropArea.value?.addEventListener('dragover', (e) => {
     e.preventDefault();
     const nItems = e.dataTransfer?.items?.length || 0;
@@ -189,9 +190,12 @@ onMounted(() => {
   if (props.queryStringParam) {
     const options = UrlService.getDownloadUrl(props.queryStringParam);
     if (options) {
-      loadUrl(options);
+      await loadUrl(options);
     }
   }
+  nextTick(() => {
+    emit('ready');
+  });
 });
 </script>
 
