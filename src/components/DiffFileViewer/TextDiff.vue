@@ -118,30 +118,28 @@ watch(differs, (newDiffers: Differ[]) => {
           >{{ formatter.actionName }}</label
         >
       </div>
-      <div
-        v-if="differ.supportedFlags & DifferFlag.IgnoreCase"
-        class="form-check form-check-inline form-switch"
-      >
+      <div class="form-check form-check-inline form-switch">
         <input
           class="form-check-input"
           type="checkbox"
           role="switch"
           :id="`zd-td-ignore-case-${uniqueID}`"
+          :disabled="(differ.supportedFlags & DifferFlag.IgnoreCase) === 0"
           v-model="ignoreCase"
         />
         <label class="form-check-label" :for="`zd-td-ignore-case-${uniqueID}`"
           >Case insensitive</label
         >
       </div>
-      <div
-        v-if="differ.supportedFlags & DifferFlag.IgnoreWhitespace"
-        class="form-check form-check-inline form-switch"
-      >
+      <div class="form-check form-check-inline form-switch">
         <input
           class="form-check-input"
           type="checkbox"
           role="switch"
           :id="`zd-td-ignore-whitespace-${uniqueID}`"
+          :disabled="
+            (differ.supportedFlags & DifferFlag.IgnoreWhitespace) === 0
+          "
           v-model="ignoreWhitespace"
         />
         <label
