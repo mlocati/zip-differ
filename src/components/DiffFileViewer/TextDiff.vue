@@ -2,6 +2,7 @@
 import {computed, ref, useId, watch} from 'vue';
 import {
   type Differ,
+  DifferFlag,
   getDiffersFromFilename,
   getFormatterFromFilename,
   type Formatter,
@@ -19,6 +20,7 @@ const formatter = computed<Formatter | null>(() => {
 });
 
 const ignoreCase = ref<boolean>(false);
+const ignoreWhitespace = ref<boolean>(false);
 const applyFormatter = ref<boolean>(false);
 
 const leftText = computed<string>(() =>
@@ -46,10 +48,14 @@ const differs = computed<Differ[]>(
 const differ = ref<Differ>(differs.value[0]);
 
 function applyDiff(oldText: string, newText: string) {
-  if (differ.value.supportsCaseSensitivity) {
-    return differ.value.apply(oldText, newText, ignoreCase.value);
+  let flags: DifferFlag = 0;
+  if (ignoreCase.value) {
+    flags |= DifferFlag.IgnoreCase;
   }
-  return differ.value.apply(oldText, newText);
+  if (ignoreWhitespace.value) {
+    flags |= DifferFlag.IgnoreWhitespace;
+  }
+  return differ.value.apply(oldText, newText, flags);
 }
 const differencesDetected = computed<boolean>(() => {
   const changes = applyDiff(leftDisplayText.value, rightDisplayText.value);
@@ -113,7 +119,7 @@ watch(differs, (newDiffers: Differ[]) => {
         >
       </div>
       <div
-        v-if="differ.supportsCaseSensitivity"
+        v-if="differ.supportedFlags & DifferFlag.IgnoreCase"
         class="form-check form-check-inline form-switch"
       >
         <input
@@ -124,7 +130,24 @@ watch(differs, (newDiffers: Differ[]) => {
           v-model="ignoreCase"
         />
         <label class="form-check-label" :for="`zd-td-ignore-case-${uniqueID}`"
-          >Case Insensitive</label
+          >Case insensitive</label
+        >
+      </div>
+      <div
+        v-if="differ.supportedFlags & DifferFlag.IgnoreWhitespace"
+        class="form-check form-check-inline form-switch"
+      >
+        <input
+          class="form-check-input"
+          type="checkbox"
+          role="switch"
+          :id="`zd-td-ignore-whitespace-${uniqueID}`"
+          v-model="ignoreWhitespace"
+        />
+        <label
+          class="form-check-label"
+          :for="`zd-td-ignore-whitespace-${uniqueID}`"
+          >Ignore spaces</label
         >
       </div>
     </div>
