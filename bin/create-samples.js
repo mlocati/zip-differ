@@ -60,7 +60,15 @@ async function createZip(relativeSourceDir, zipName, tempDir) {
                 resolve(RESULT.Unchanged);
               } else {
                 fs.unlinkSync(absoluteTargetFile);
-                fs.renameSync(tempFile, absoluteTargetFile);
+                try {
+                  fs.renameSync(tempFile, absoluteTargetFile);
+                } catch (error) {
+                  if (error?.code !== 'EXDEV') {
+                    throw error;
+                  }
+                  fs.copyFileSync(tempFile, absoluteTargetFile);
+                  fs.unlinkSync(tempFile);
+                }
                 resolve(RESULT.Updated);
               }
             });

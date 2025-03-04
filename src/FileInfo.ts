@@ -8,6 +8,12 @@ export enum FileFormat {
   Image,
 }
 
+export enum DifferFlag {
+  None = 0,
+  IgnoreCase = 0b1,
+  IgnoreWhitespace = 0b10,
+}
+
 // Remmeber to register the languages in main.to too
 enum HighlightjsLanguages {
   AsciiDoc = 'asciidoc',
@@ -64,34 +70,41 @@ const FORMATTERS: Record<'CSS' | 'Html' | 'JavaScript' | 'XML', Formatter> = {
   },
 };
 
-interface CaseUnawareDiffer {
+export interface Differ {
   name: string;
-  supportsCaseSensitivity: false;
-  apply: (oldText: string, newText: string) => ReadonlyArray<Diff.Change>;
-}
-
-interface CaseAwareDiffer {
-  name: string;
-  supportsCaseSensitivity: true;
+  supportedFlags: DifferFlag;
   apply: (
     oldText: string,
     newText: string,
-    ignoreCase: boolean,
+    flags: DifferFlag,
   ) => ReadonlyArray<Diff.Change>;
 }
 
-export type Differ = CaseAwareDiffer | CaseUnawareDiffer;
+function hasFlag(flag: DifferFlag, target: DifferFlag): boolean {
+  return (flag & target) !== 0;
+}
 
 const DIFFERS: Record<
-  'Patch' | 'Chars' | 'CSS' | 'JSON' | 'Lines' | 'Words' | 'WordsIgnoreSpaces',
+  'Patch' | 'Chars' | 'CSS' | 'JSON' | 'Lines' | 'Words',
   Differ
 > = {
   Patch: {
     name: 'Patch',
-    supportsCaseSensitivity: false,
-    apply: (oldText: string, newText: string) => {
+    supportedFlags: DifferFlag.IgnoreCase,
+    apply: (oldText: string, newText: string, flags: DifferFlag) => {
+      const options = {
+        ignoreCase: hasFlag(flags, DifferFlag.IgnoreCase),
+      };
       let headerReached = false;
-      return Diff.createTwoFilesPatch('left', 'right', oldText, newText)
+      return Diff.createTwoFilesPatch(
+        'left',
+        'right',
+        oldText,
+        newText,
+        undefined,
+        undefined,
+        options,
+      )
         .split('\n')
         .filter((line: string): boolean => {
           if (line.startsWith('@@')) {
@@ -109,46 +122,54 @@ const DIFFERS: Record<
     },
   },
   Chars: {
-    name: 'Char by Char',
-    supportsCaseSensitivity: true,
-    apply: (oldText: string, newText: string, ignoreCase: boolean) =>
-      Diff.diffChars(oldText, newText, {ignoreCase}),
+    name: 'Break at chars',
+    supportedFlags: DifferFlag.IgnoreCase,
+    apply: (oldText: string, newText: string, flags: DifferFlag) =>
+      Diff.diffChars(oldText, newText, {
+        ignoreCase: hasFlag(flags, DifferFlag.IgnoreCase),
+      }),
   },
   Words: {
-    name: 'Word by Word',
-    supportsCaseSensitivity: true,
-    apply: (oldText: string, newText: string, ignoreCase: boolean) =>
-      Diff.diffWordsWithSpace(oldText, newText, {ignoreCase}),
-  },
-  WordsIgnoreSpaces: {
-    name: 'Word by Word (ignoring spaces)',
-    supportsCaseSensitivity: true,
-    apply: (oldText: string, newText: string, ignoreCase: boolean) =>
-      Diff.diffWords(oldText, newText, {ignoreCase}),
+    name: 'Break at words',
+    supportedFlags: DifferFlag.IgnoreCase | DifferFlag.IgnoreWhitespace,
+    apply: (oldText: string, newText: string, flags: DifferFlag) => {
+      const options = {ignoreCase: hasFlag(flags, DifferFlag.IgnoreCase)};
+      if (hasFlag(flags, DifferFlag.IgnoreWhitespace)) {
+        return Diff.diffWords(oldText, newText, options);
+      }
+      return Diff.diffWordsWithSpace(oldText, newText, options);
+    },
   },
   Lines: {
-    name: 'Line by Line',
-    supportsCaseSensitivity: false,
-    apply: (oldText: string, newText: string) =>
-      Diff.diffLines(oldText, newText),
+    name: 'Break at lines',
+    supportedFlags: DifferFlag.IgnoreCase,
+    apply: (oldText: string, newText: string, flags: DifferFlag) =>
+      Diff.diffLines(oldText, newText, {
+        ignoreCase: hasFlag(flags, DifferFlag.IgnoreCase),
+      }),
   },
   CSS: {
     name: 'CSS',
-    supportsCaseSensitivity: false,
-    apply: (oldText: string, newText: string) => Diff.diffCss(oldText, newText),
+    supportedFlags: DifferFlag.IgnoreCase,
+    apply: (oldText: string, newText: string, flags: DifferFlag) =>
+      Diff.diffCss(oldText, newText, {
+        ignoreCase: hasFlag(flags, DifferFlag.IgnoreCase),
+      }),
   },
   JSON: {
     name: 'JSON',
-    supportsCaseSensitivity: false,
-    apply: (oldText: string, newText: string) =>
-      Diff.diffJson(oldText, newText),
+    supportedFlags: DifferFlag.IgnoreCase | DifferFlag.IgnoreWhitespace,
+    apply: (oldText: string, newText: string, flags: DifferFlag) =>
+      Diff.diffJson(oldText, newText, {
+        ignoreCase: hasFlag(flags, DifferFlag.IgnoreCase),
+      }),
   },
 };
+
 const COMMON_DIFFERS: NonEmptyArray<Differ> = [
   DIFFERS.Patch,
   DIFFERS.Lines,
   DIFFERS.Words,
-  DIFFERS.WordsIgnoreSpaces,
   DIFFERS.Chars,
 ];
 
