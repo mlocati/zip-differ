@@ -1,3 +1,4 @@
+import {FileFormat, getFileFormatsFromFilename} from './FileInfo';
 import {
   InputArchive,
   type InputDirectory,
@@ -5,13 +6,19 @@ import {
   type InputFile,
 } from './InputArchive';
 
+export enum DifferenceType {
+  None = 0,
+  WhitespacesOnly = 1,
+  Different = 2,
+}
+
 export abstract class DiffEntry {
   abstract get name(): string;
   abstract get left(): InputItem | null;
   abstract get right(): InputItem | null;
   abstract get parent(): DiffDirectory | null;
   abstract get notes(): string;
-  abstract get isDifferent(): boolean;
+  abstract get differenceType(): DifferenceType;
   get path(): string {
     return (this.parent?.path.replace(/\/$/, '') || '') + '/' + this.name;
   }
@@ -23,7 +30,7 @@ export class DiffFile extends DiffEntry {
   readonly left: InputFile | null;
   readonly right: InputFile | null;
   readonly parent: DiffDirectory;
-  readonly isDifferent: boolean;
+  readonly differenceType: DifferenceType;
   readonly notes: string;
   constructor(
     left: InputFile | null,
@@ -35,24 +42,42 @@ export class DiffFile extends DiffEntry {
     this.left = left;
     this.right = right;
     this.parent = parent;
-    let notes: string = '';
+    this.notes = '';
     if (left === null && right === null) {
-      this.isDifferent = true;
-      notes = 'File missing in both archives';
+      this.differenceType = DifferenceType.Different;
+      this.notes = 'File missing in both archives';
     } else if (left === null) {
-      this.isDifferent = true;
-      notes = 'File missing in left archive';
+      this.differenceType = DifferenceType.Different;
+      this.notes = 'File missing in left archive';
     } else if (right === null) {
-      this.isDifferent = true;
-      notes = 'File missing in right archive';
+      this.differenceType = DifferenceType.Different;
+      this.notes = 'File missing in right archive';
     } else {
       if (left.name !== right.name) {
-        notes = `File name changed from "${left.name}" to "${right.name}"`;
+        this.notes = `File name changed from "${left.name}" to "${right.name}"`;
       }
-      this.isDifferent =
-        left.size !== right.size || indexedDB.cmp(left.data, right.data) !== 0;
+      if (
+        left.size === right.size &&
+        indexedDB.cmp(left.data, right.data) === 0
+      ) {
+        this.differenceType = DifferenceType.None;
+      } else {
+        this.differenceType = DifferenceType.Different;
+        if (getFileFormatsFromFilename(left.name).includes(FileFormat.Text)) {
+          try {
+            const leftText: string = new TextDecoder().decode(left.data);
+            const rightText: string = new TextDecoder().decode(right.data);
+            if (
+              leftText.replace(/[\s\r\n]/g, '') ===
+              rightText.replace(/[\s\r\n]/g, '')
+            ) {
+              this.differenceType = DifferenceType.WhitespacesOnly;
+              this.notes = 'Only whitespace differences';
+            }
+          } catch (_) {}
+        }
+      }
     }
-    this.notes = notes;
   }
 }
 
@@ -64,19 +89,24 @@ export class DiffDirectory extends DiffEntry {
   readonly subdirs: DiffDirectory[];
   readonly files: DiffFile[];
   readonly notes: string;
-  get isDifferent(): boolean {
+  get differenceType(): DifferenceType {
     if (this.left === null || this.right === null) {
-      return true;
+      return DifferenceType.Different;
     }
-    if (this.files.some((file: DiffFile): boolean => file.isDifferent)) {
-      return true;
+    let result = DifferenceType.None;
+    this.files.forEach((file: DiffFile): void => {
+      result = <DifferenceType>(
+        Math.max(<number>result, <number>file.differenceType)
+      );
+    });
+    if (result < DifferenceType.Different) {
+      this.subdirs.forEach((subdir: DiffDirectory): void => {
+        result = <DifferenceType>(
+          Math.max(<number>result, <number>subdir.differenceType)
+        );
+      });
     }
-    if (
-      this.subdirs.some((subdir: DiffDirectory): boolean => subdir.isDifferent)
-    ) {
-      return true;
-    }
-    return false;
+    return result;
   }
 
   constructor(
