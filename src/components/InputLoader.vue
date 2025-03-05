@@ -2,7 +2,7 @@
 import {computed, ref, watch} from 'vue';
 import Side from './InputLoader/Side.vue';
 import {InputArchive} from '../InputArchive';
-import {DiffArchive} from '../Differ';
+import {DiffArchive, DifferenceType} from '../Differ';
 
 enum Sides {
   Left,
@@ -62,7 +62,7 @@ function compare(): void {
     return;
   }
   const diff = new DiffArchive(leftArchive.value!, rightArchive.value!);
-  if (!diff.isDifferent) {
+  if (diff.differenceType === DifferenceType.None) {
     window.alert('The archives are identical.');
     return;
   }

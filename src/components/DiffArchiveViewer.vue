@@ -2,6 +2,7 @@
 import {computed, ref, useId} from 'vue';
 import {
   DiffDirectory,
+  DifferenceType,
   DiffFile,
   type DiffArchive,
   type DiffEntry,
@@ -53,7 +54,11 @@ function flatten(
   }
   const depth = parent ? parent.depth + 1 : 0;
   dir.subdirs.forEach((subdir) => {
-    if (!showUnchanged.value && !subdir.isDifferent && subdir.notes === '') {
+    if (
+      !showUnchanged.value &&
+      subdir.differenceType === DifferenceType.None &&
+      subdir.notes === ''
+    ) {
       return;
     }
     const subdirFlat = new FlatEntry(subdir, depth, parent);
@@ -61,7 +66,11 @@ function flatten(
     flatten(result, subdir, subdirFlat);
   });
   dir.files.forEach((file) => {
-    if (!showUnchanged.value && !file.isDifferent && file.notes === '') {
+    if (
+      !showUnchanged.value &&
+      file.differenceType === DifferenceType.None &&
+      file.notes === ''
+    ) {
       return;
     }
     result.push(new FlatEntry(file, depth, parent));
@@ -75,7 +84,17 @@ const flatEntries = computed<FlatEntry[]>(() => {
 });
 function getEntryClasses(entry: DiffEntry): string {
   const result = [];
-  result.push(entry.isDifferent ? 'diff-different' : 'diff-same');
+  switch (entry.differenceType) {
+    case DifferenceType.None:
+      result.push('diff-same');
+      break;
+    case DifferenceType.WhitespacesOnly:
+      result.push('diff-different-whitespaces');
+      break;
+    case DifferenceType.Different:
+      result.push('diff-different');
+      break;
+  }
   result.push(entry instanceof DiffFile ? 'diff-file' : 'diff-directory');
   return result.join(' ');
 }
@@ -148,7 +167,7 @@ function viewDiffFile(diffFile: DiffFile): void {
                   entry.entry instanceof DiffFile &&
                   entry.entry.left !== null &&
                   entry.entry.right !== null &&
-                  entry.entry.isDifferent
+                  entry.entry.differenceType !== DifferenceType.None
                 "
               >
                 <a
@@ -203,6 +222,9 @@ tr a {
 }
 tr.diff-same > * {
   background-color: rgba(var(--bs-success-rgb), 0.3);
+}
+tr.diff-different-whitespaces > * {
+  background-color: rgba(var(--bs-info-rgb), 0.3);
 }
 tr.diff-different > * {
   background-color: rgba(var(--bs-danger-rgb), 0.3);
