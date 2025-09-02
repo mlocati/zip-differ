@@ -42,10 +42,10 @@ const rightDisplayText = computed<string>(() =>
 );
 
 const differs = computed<Differ[]>(
-  () => getDiffersFromFilename(props.diffFile.name)!,
+  () => getDiffersFromFilename(props.diffFile.name) || [],
 );
 
-const differ = ref<Differ>(differs.value[0]);
+const differ = ref<Differ | null>(differs.value[0] || null);
 
 function applyDiff(oldText: string, newText: string) {
   let flags: DifferFlag = 0;
@@ -55,7 +55,7 @@ function applyDiff(oldText: string, newText: string) {
   if (ignoreWhitespace.value) {
     flags |= DifferFlag.IgnoreWhitespace;
   }
-  return differ.value.apply(oldText, newText, flags);
+  return differ.value?.apply(oldText, newText, flags) || [];
 }
 const differencesDetected = computed<boolean>(() => {
   const changes = applyDiff(leftDisplayText.value, rightDisplayText.value);
@@ -87,7 +87,7 @@ const diffHtml = computed<string>(() => {
   return chunks.join('');
 });
 watch(differs, (newDiffers: Differ[]) => {
-  differ.value = newDiffers[0];
+  differ.value = newDiffers[0] || null;
 });
 </script>
 
@@ -124,7 +124,9 @@ watch(differs, (newDiffers: Differ[]) => {
           type="checkbox"
           role="switch"
           :id="`zd-td-ignore-case-${uniqueID}`"
-          :disabled="(differ.supportedFlags & DifferFlag.IgnoreCase) === 0"
+          :disabled="
+            ((differ?.supportedFlags || 0) & DifferFlag.IgnoreCase) === 0
+          "
           v-model="ignoreCase"
         />
         <label class="form-check-label" :for="`zd-td-ignore-case-${uniqueID}`"
@@ -138,7 +140,7 @@ watch(differs, (newDiffers: Differ[]) => {
           role="switch"
           :id="`zd-td-ignore-whitespace-${uniqueID}`"
           :disabled="
-            (differ.supportedFlags & DifferFlag.IgnoreWhitespace) === 0
+            ((differ?.supportedFlags || 0) & DifferFlag.IgnoreWhitespace) === 0
           "
           v-model="ignoreWhitespace"
         />

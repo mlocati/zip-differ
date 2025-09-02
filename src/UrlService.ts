@@ -29,13 +29,13 @@ export function setDownloadUrl(
     if (newParams[key] === '') {
       params.delete(key);
     } else {
-      params.set(key, newParams[key]);
+      params.set(key, newParams[key]!);
     }
     delete newParams[key];
   });
   for (const key in newParams) {
     if (newParams[key] !== '') {
-      params.set(key, newParams[key]);
+      params.set(key, newParams[key]!);
     }
   }
   const sortedParams = new URLSearchParams();

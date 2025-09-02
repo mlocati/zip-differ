@@ -152,7 +152,7 @@ onMounted(async () => {
     const nItems = e.dataTransfer?.items?.length || 0;
     if (nItems === 1) {
       for (let i = 0; i < nItems; i++) {
-        if (e.dataTransfer!.items[i].kind === 'file') {
+        if (e.dataTransfer!.items[i]!.kind === 'file') {
           e.dataTransfer!.dropEffect = 'copy';
           dropArea.value?.classList.add('dragover');
           return;
@@ -168,7 +168,7 @@ onMounted(async () => {
     e.preventDefault();
     dropArea.value?.classList.remove('dragover');
     if (e.dataTransfer?.files?.length === 1) {
-      loadFile(e.dataTransfer.files[0]);
+      loadFile(e.dataTransfer.files[0]!);
     }
   });
   fileInput.value?.addEventListener('change', () => {
@@ -182,7 +182,7 @@ onMounted(async () => {
       fileInput.value!.value = '';
       return;
     }
-    loadFile(files[0]);
+    loadFile(files[0]!);
     setTimeout(() => {
       fileInput.value!.value = '';
     }, 500);

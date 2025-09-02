@@ -21,7 +21,7 @@ Object.values(Unit).forEach((unit: Unit) => {
 
 function formatUnsigned(size: number): string {
   if (size < 1024) {
-    return FORMATTERS[Unit.Byte].format(size);
+    return FORMATTERS[Unit.Byte]!.format(size);
   }
   const units: Unit[] = Object.values(Unit);
   units.shift();
@@ -29,12 +29,12 @@ function formatUnsigned(size: number): string {
   let divisor = 1024;
   for (const nextUnit of units) {
     if (size < divisor * 1024) {
-      return FORMATTERS[unit].format(size / divisor);
+      return FORMATTERS[unit]!.format(size / divisor);
     }
     unit = nextUnit;
     divisor *= 1024;
   }
-  return FORMATTERS[unit].format(size / divisor);
+  return FORMATTERS[unit]!.format(size / divisor);
 }
 
 export function formatSize(size: number): string {

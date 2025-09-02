@@ -64,12 +64,18 @@ watch(
 async function loadImages(): Promise<void> {
   try {
     loadError.value = '';
-    leftInfo.value = await inspectImageData(props.diffFile.left!.data, {
-      filename: props.diffFile.left!.name,
-    });
-    rightInfo.value = await inspectImageData(props.diffFile.right!.data, {
-      filename: props.diffFile.right!.name,
-    });
+    leftInfo.value = await inspectImageData(
+      props.diffFile.left!.data.buffer as ArrayBuffer,
+      {
+        filename: props.diffFile.left!.name,
+      },
+    );
+    rightInfo.value = await inspectImageData(
+      props.diffFile.right!.data.buffer as ArrayBuffer,
+      {
+        filename: props.diffFile.right!.name,
+      },
+    );
   } catch (e: Error | any) {
     leftInfo.value = null;
     rightInfo.value = null;

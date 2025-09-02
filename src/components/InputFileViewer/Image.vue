@@ -32,9 +32,12 @@ watch(
 async function loadImage(): Promise<void> {
   try {
     loadError.value = '';
-    imageInfo.value = await inspectImageData(props.inputFile.data, {
-      filename: props.inputFile.name,
-    });
+    imageInfo.value = await inspectImageData(
+      props.inputFile.data.buffer as ArrayBuffer,
+      {
+        filename: props.inputFile.name,
+      },
+    );
   } catch (e: Error | any) {
     imageInfo.value = null;
     loadError.value = e?.message || e?.toString() || 'Unknown error';
