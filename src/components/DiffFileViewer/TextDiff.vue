@@ -21,6 +21,7 @@ const formatter = computed<Formatter | null>(() => {
 
 const ignoreCase = ref<boolean>(false);
 const ignoreWhitespace = ref<boolean>(false);
+const normalizeEOL = ref<boolean>(false);
 const applyFormatter = ref<boolean>(false);
 
 const leftText = computed<string>(() =>
@@ -49,6 +50,10 @@ const differ = ref<Differ | null>(differs.value[0] || null);
 
 function applyDiff(oldText: string, newText: string) {
   let flags: DifferFlag = 0;
+  if (normalizeEOL.value) {
+    oldText = oldText.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+    newText = newText.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+  }
   if (ignoreCase.value) {
     flags |= DifferFlag.IgnoreCase;
   }
@@ -93,7 +98,7 @@ watch(differs, (newDiffers: Differ[]) => {
 
 <template>
   <div class="row mb-2">
-    <div class="col">
+    <div class="col-3">
       <select v-model="differ" class="form-control">
         <option v-for="differ in differs" :value="differ">
           {{ differ.name }}
@@ -148,6 +153,18 @@ watch(differs, (newDiffers: Differ[]) => {
           class="form-check-label"
           :for="`zd-td-ignore-whitespace-${uniqueID}`"
           >Ignore spaces</label
+        >
+      </div>
+      <div class="form-check form-check-inline form-switch">
+        <input
+          class="form-check-input"
+          type="checkbox"
+          role="switch"
+          :id="`zd-td-normalize-eol-${uniqueID}`"
+          v-model="normalizeEOL"
+        />
+        <label class="form-check-label" :for="`zd-td-normalize-eol-${uniqueID}`"
+          >Normalize EOL</label
         >
       </div>
     </div>
