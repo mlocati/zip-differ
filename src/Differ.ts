@@ -157,7 +157,7 @@ export class DiffDirectory extends DiffEntry {
         right.subdirs.length === 1
       ) {
         this.subdirs.push(
-          new DiffDirectory(left.subdirs[0], right.subdirs[0], this),
+          new DiffDirectory(left.subdirs[0]!, right.subdirs[0]!, this),
         );
       } else {
         const rightDirs: InputDirectory[] = [];

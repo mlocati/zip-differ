@@ -37,8 +37,8 @@ const currentZoomLevels = computed<number[]>(() => {
   if (result.length < 2) {
     const mul = [2, 5, 10, 20, 50, 100, 200, 500, 1000];
     for (let i = 0; i < mul.length; i++) {
-      result.push(mul[i]);
-      result.push(1 / mul[i]);
+      result.push(mul[i]!);
+      result.push(1 / mul[i]!);
     }
   }
   if (zoomLevel.value !== undefined && !result.includes(zoomLevel.value)) {

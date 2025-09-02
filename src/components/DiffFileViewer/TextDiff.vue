@@ -124,7 +124,9 @@ watch(differs, (newDiffers: Differ[]) => {
           type="checkbox"
           role="switch"
           :id="`zd-td-ignore-case-${uniqueID}`"
-          :disabled="(differ.supportedFlags & DifferFlag.IgnoreCase) === 0"
+          :disabled="
+            ((differ?.supportedFlags || 0) & DifferFlag.IgnoreCase) === 0
+          "
           v-model="ignoreCase"
         />
         <label class="form-check-label" :for="`zd-td-ignore-case-${uniqueID}`"
@@ -138,7 +140,7 @@ watch(differs, (newDiffers: Differ[]) => {
           role="switch"
           :id="`zd-td-ignore-whitespace-${uniqueID}`"
           :disabled="
-            (differ.supportedFlags & DifferFlag.IgnoreWhitespace) === 0
+            ((differ?.supportedFlags || 0) & DifferFlag.IgnoreWhitespace) === 0
           "
           v-model="ignoreWhitespace"
         />

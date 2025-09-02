@@ -8,8 +8,8 @@ export enum Origins {
 
 export type Origin = DownloadOptions | Origins;
 
-function download(filename: string, data: ArrayBuffer): void {
-  const blob = new Blob([data], {type: 'application/octet-stream'});
+function download(filename: string, data: ArrayBuffer | Uint8Array): void {
+  const blob = new Blob([data as BlobPart], {type: 'application/octet-stream'});
   const url = URL.createObjectURL(blob);
   try {
     const a = document.createElement('a');
@@ -114,7 +114,7 @@ export class InputDirectory extends InputItem {
       return this;
     }
     const chunks = path.split('/');
-    const name = chunks[0];
+    const name = chunks[0]!;
     let subdir = this.subdirs.find((d) => d.name === name);
     if (subdir === undefined && !caseSensitive) {
       const nameLC = name.toLowerCase();
@@ -143,7 +143,7 @@ export class InputDirectory extends InputItem {
       return null;
     }
     const chunks = path.split('/');
-    const name = chunks[chunks.length - 1];
+    const name = chunks[chunks.length - 1]!;
     const dir = this.getDirectoryByPath(
       chunks.slice(0, -1).join('/'),
       caseSensitive,
@@ -220,7 +220,7 @@ async function processZipEntry(
   );
   dir.files.push(
     new InputFile(
-      chunks[chunks.length - 1],
+      chunks[chunks.length - 1]!,
       dir,
       await entry.async('uint8array'),
     ),

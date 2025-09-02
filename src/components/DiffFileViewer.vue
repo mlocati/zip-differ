@@ -39,14 +39,14 @@ const availableTabs = computed<Tabs[]>(() => {
   return tabs;
 });
 
-const currentTab = ref<Tabs>(availableTabs.value[0]);
+const currentTab = ref<Tabs>(availableTabs.value[0]!);
 
 watch(availableTabs, (newTabs) => {
-  currentTab.value = newTabs[0];
+  currentTab.value = newTabs[0]!;
 });
 
 onMounted(() => {
-  currentTab.value = availableTabs.value[0];
+  currentTab.value = availableTabs.value[0]!;
 });
 </script>
 <template>
