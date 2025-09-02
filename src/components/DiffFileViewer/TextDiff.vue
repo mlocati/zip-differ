@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, ref, useId, watch} from 'vue';
+import {computed, onMounted, ref, useId, watch} from 'vue';
 import {
   type Differ,
   DifferFlag,
@@ -8,6 +8,7 @@ import {
   type Formatter,
 } from '../../FileInfo';
 import type {DiffFile} from '../../Differ';
+import * as PersistentSettings from '../../PersistentSettings';
 
 const uniqueID = useId();
 
@@ -21,6 +22,7 @@ const formatter = computed<Formatter | null>(() => {
 
 const ignoreCase = ref<boolean>(false);
 const ignoreWhitespace = ref<boolean>(false);
+const normalizeEOL = ref<boolean>(false);
 const applyFormatter = ref<boolean>(false);
 
 const leftText = computed<string>(() =>
@@ -49,6 +51,10 @@ const differ = ref<Differ | null>(differs.value[0] || null);
 
 function applyDiff(oldText: string, newText: string) {
   let flags: DifferFlag = 0;
+  if (normalizeEOL.value) {
+    oldText = oldText.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+    newText = newText.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+  }
   if (ignoreCase.value) {
     flags |= DifferFlag.IgnoreCase;
   }
@@ -89,11 +95,54 @@ const diffHtml = computed<string>(() => {
 watch(differs, (newDiffers: Differ[]) => {
   differ.value = newDiffers[0] || null;
 });
+
+onMounted(() => {
+  ignoreCase.value = PersistentSettings.loadBoolean(
+    PersistentSettings.Key.Diff_ignoreCase,
+  );
+  ignoreWhitespace.value = PersistentSettings.loadBoolean(
+    PersistentSettings.Key.Diff_ignoreWhitespace,
+  );
+  normalizeEOL.value = PersistentSettings.loadBoolean(
+    PersistentSettings.Key.Diff_normalizeEOL,
+  );
+  applyFormatter.value = PersistentSettings.loadBoolean(
+    PersistentSettings.Key.Diff_applyFormatter,
+  );
+});
+
+watch(ignoreCase, (newValue: boolean) => {
+  PersistentSettings.saveBoolean(
+    PersistentSettings.Key.Diff_ignoreCase,
+    newValue,
+  );
+});
+
+watch(ignoreWhitespace, (newValue: boolean) => {
+  PersistentSettings.saveBoolean(
+    PersistentSettings.Key.Diff_ignoreWhitespace,
+    newValue,
+  );
+});
+
+watch(normalizeEOL, (newValue: boolean) => {
+  PersistentSettings.saveBoolean(
+    PersistentSettings.Key.Diff_normalizeEOL,
+    newValue,
+  );
+});
+
+watch(applyFormatter, (newValue: boolean) => {
+  PersistentSettings.saveBoolean(
+    PersistentSettings.Key.Diff_applyFormatter,
+    newValue,
+  );
+});
 </script>
 
 <template>
   <div class="row mb-2">
-    <div class="col">
+    <div class="col-3">
       <select v-model="differ" class="form-control">
         <option v-for="differ in differs" :value="differ">
           {{ differ.name }}
@@ -148,6 +197,18 @@ watch(differs, (newDiffers: Differ[]) => {
           class="form-check-label"
           :for="`zd-td-ignore-whitespace-${uniqueID}`"
           >Ignore spaces</label
+        >
+      </div>
+      <div class="form-check form-check-inline form-switch">
+        <input
+          class="form-check-input"
+          type="checkbox"
+          role="switch"
+          :id="`zd-td-normalize-eol-${uniqueID}`"
+          v-model="normalizeEOL"
+        />
+        <label class="form-check-label" :for="`zd-td-normalize-eol-${uniqueID}`"
+          >Normalize EOL</label
         >
       </div>
     </div>
