@@ -15,25 +15,24 @@
   "dependencies": {
     "@highlightjs/vue-plugin": "^2.1.0",
     "@popperjs/core": "^2.11.8",
-    "bootstrap": "^5.3.3",
-    "diff": "^7.0.0",
+    "bootstrap": "^5.3.8",
+    "diff": "^8.0.2",
     "highlight.js": "^11.11.1",
     "image-compare-viewer": "^1.6.2",
-    "js-beautify": "^1.15.3",
+    "js-beautify": "^1.15.4",
     "jszip": "^3.10.1",
     "mitt": "^3.0.1",
-    "vue": "^3.5.13"
+    "vue": "^3.5.20"
   },
   "devDependencies": {
     "@types/bootstrap": "^5.2.10",
-    "@types/diff": "^7.0.1",
     "@types/js-beautify": "^1.14.3",
-    "@vitejs/plugin-vue": "^5.2.1",
-    "@vue/tsconfig": "^0.7.0",
-    "prettier": "^3.5.2",
-    "sass-embedded": "^1.85.0",
-    "typescript": "~5.7.2",
-    "vite": "^6.1.0",
-    "vue-tsc": "^2.2.0"
+    "@vitejs/plugin-vue": "^6.0.1",
+    "@vue/tsconfig": "^0.8.1",
+    "prettier": "^3.6.2",
+    "sass-embedded": "^1.91.0",
+    "typescript": "^5.9.2",
+    "vite": "^7.1.4",
+    "vue-tsc": "^3.0.6"
   }
 }

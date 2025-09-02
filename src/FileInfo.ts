@@ -90,11 +90,8 @@ const DIFFERS: Record<
 > = {
   Patch: {
     name: 'Patch',
-    supportedFlags: DifferFlag.IgnoreCase,
-    apply: (oldText: string, newText: string, flags: DifferFlag) => {
-      const options = {
-        ignoreCase: hasFlag(flags, DifferFlag.IgnoreCase),
-      };
+    supportedFlags: DifferFlag.None,
+    apply: (oldText: string, newText: string, _: DifferFlag) => {
       let headerReached = false;
       return Diff.createTwoFilesPatch(
         'left',
@@ -103,7 +100,7 @@ const DIFFERS: Record<
         newText,
         undefined,
         undefined,
-        options,
+        {},
       )
         .split('\n')
         .filter((line: string): boolean => {
@@ -117,6 +114,7 @@ const DIFFERS: Record<
             value: line + '\n',
             added: line.startsWith('+'),
             removed: line.startsWith('-'),
+            count: 1,
           };
         });
     },
@@ -133,36 +131,33 @@ const DIFFERS: Record<
     name: 'Break at words',
     supportedFlags: DifferFlag.IgnoreCase | DifferFlag.IgnoreWhitespace,
     apply: (oldText: string, newText: string, flags: DifferFlag) => {
-      const options = {ignoreCase: hasFlag(flags, DifferFlag.IgnoreCase)};
       if (hasFlag(flags, DifferFlag.IgnoreWhitespace)) {
-        return Diff.diffWords(oldText, newText, options);
+        return Diff.diffWords(oldText, newText, {
+          ignoreCase: hasFlag(flags, DifferFlag.IgnoreCase),
+        });
       }
-      return Diff.diffWordsWithSpace(oldText, newText, options);
+      return Diff.diffWordsWithSpace(oldText, newText, {
+        ignoreCase: hasFlag(flags, DifferFlag.IgnoreCase),
+      });
     },
   },
   Lines: {
     name: 'Break at lines',
-    supportedFlags: DifferFlag.IgnoreCase,
-    apply: (oldText: string, newText: string, flags: DifferFlag) =>
-      Diff.diffLines(oldText, newText, {
-        ignoreCase: hasFlag(flags, DifferFlag.IgnoreCase),
-      }),
+    supportedFlags: DifferFlag.None,
+    apply: (oldText: string, newText: string, _: DifferFlag) =>
+      Diff.diffLines(oldText, newText, {}),
   },
   CSS: {
     name: 'CSS',
-    supportedFlags: DifferFlag.IgnoreCase,
-    apply: (oldText: string, newText: string, flags: DifferFlag) =>
-      Diff.diffCss(oldText, newText, {
-        ignoreCase: hasFlag(flags, DifferFlag.IgnoreCase),
-      }),
+    supportedFlags: DifferFlag.None,
+    apply: (oldText: string, newText: string, _: DifferFlag) =>
+      Diff.diffCss(oldText, newText, {}),
   },
   JSON: {
     name: 'JSON',
-    supportedFlags: DifferFlag.IgnoreCase | DifferFlag.IgnoreWhitespace,
-    apply: (oldText: string, newText: string, flags: DifferFlag) =>
-      Diff.diffJson(oldText, newText, {
-        ignoreCase: hasFlag(flags, DifferFlag.IgnoreCase),
-      }),
+    supportedFlags: DifferFlag.None,
+    apply: (oldText: string, newText: string, _: DifferFlag) =>
+      Diff.diffJson(oldText, newText, {}),
   },
 };
 
@@ -451,7 +446,7 @@ function getExtensionInfoFromExtension(
 ): ExtensionInfo | null {
   extension = extension.toLowerCase();
   if (EXTENSIONS.hasOwnProperty(extension)) {
-    return EXTENSIONS[extension];
+    return EXTENSIONS[extension]!;
   }
   let aliasOf = EXTENSION_ALIASES[extension];
   if (aliasOf === undefined) {
@@ -462,7 +457,7 @@ function getExtensionInfoFromExtension(
       `Invalid extension mapping: ${extension} is a alias of ${aliasOf}, but ${aliasOf} is not defined`,
     );
   }
-  return EXTENSIONS[aliasOf];
+  return EXTENSIONS[aliasOf]!;
 }
 
 function extractExtensionFromFilename(filename: string): string {
