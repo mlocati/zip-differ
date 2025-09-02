@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, ref, useId, watch} from 'vue';
+import {computed, onMounted, ref, useId, watch} from 'vue';
 import {
   type Differ,
   DifferFlag,
@@ -8,6 +8,7 @@ import {
   type Formatter,
 } from '../../FileInfo';
 import type {DiffFile} from '../../Differ';
+import * as PersistentSettings from '../../PersistentSettings';
 
 const uniqueID = useId();
 
@@ -93,6 +94,49 @@ const diffHtml = computed<string>(() => {
 });
 watch(differs, (newDiffers: Differ[]) => {
   differ.value = newDiffers[0] || null;
+});
+
+onMounted(() => {
+  ignoreCase.value = PersistentSettings.loadBoolean(
+    PersistentSettings.Key.Diff_ignoreCase,
+  );
+  ignoreWhitespace.value = PersistentSettings.loadBoolean(
+    PersistentSettings.Key.Diff_ignoreWhitespace,
+  );
+  normalizeEOL.value = PersistentSettings.loadBoolean(
+    PersistentSettings.Key.Diff_normalizeEOL,
+  );
+  applyFormatter.value = PersistentSettings.loadBoolean(
+    PersistentSettings.Key.Diff_applyFormatter,
+  );
+});
+
+watch(ignoreCase, (newValue: boolean) => {
+  PersistentSettings.saveBoolean(
+    PersistentSettings.Key.Diff_ignoreCase,
+    newValue,
+  );
+});
+
+watch(ignoreWhitespace, (newValue: boolean) => {
+  PersistentSettings.saveBoolean(
+    PersistentSettings.Key.Diff_ignoreWhitespace,
+    newValue,
+  );
+});
+
+watch(normalizeEOL, (newValue: boolean) => {
+  PersistentSettings.saveBoolean(
+    PersistentSettings.Key.Diff_normalizeEOL,
+    newValue,
+  );
+});
+
+watch(applyFormatter, (newValue: boolean) => {
+  PersistentSettings.saveBoolean(
+    PersistentSettings.Key.Diff_applyFormatter,
+    newValue,
+  );
 });
 </script>
 
