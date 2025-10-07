@@ -16,6 +16,8 @@ const props = defineProps<{
   diffFile: DiffFile;
 }>();
 
+const PERSISTENTSETTINGSKEY_DIFFER = 'textDiff.differ';
+
 const formatter = computed<Formatter | null>(() => {
   return getFormatterFromFilename(props.diffFile.name);
 });
@@ -97,6 +99,15 @@ watch(differs, (newDiffers: Differ[]) => {
 });
 
 onMounted(() => {
+  const differName = PersistentSettings.loadString(
+    PERSISTENTSETTINGSKEY_DIFFER,
+  );
+  if (differName !== null) {
+    const matchedDiffer = differs.value.find((d) => d.name === differName);
+    if (matchedDiffer) {
+      differ.value = matchedDiffer;
+    }
+  }
   ignoreCase.value = PersistentSettings.loadBoolean(
     PersistentSettings.Key.Diff_ignoreCase,
   );
@@ -108,6 +119,13 @@ onMounted(() => {
   );
   applyFormatter.value = PersistentSettings.loadBoolean(
     PersistentSettings.Key.Diff_applyFormatter,
+  );
+});
+
+watch(differ, (newValue: Differ | null) => {
+  PersistentSettings.saveString(
+    PERSISTENTSETTINGSKEY_DIFFER,
+    newValue?.name || '',
   );
 });
 
