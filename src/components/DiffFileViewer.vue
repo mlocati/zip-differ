@@ -8,17 +8,20 @@ import TextDiff from './DiffFileViewer/TextDiff.vue';
 import TextSideBySide from './DiffFileViewer/TextSideBySide.vue';
 import ImageSideBySide from './DiffFileViewer/ImageSideBySide.vue';
 import ImageSlider from './DiffFileViewer/ImageSlider.vue';
+import * as PersistentSettings from '../PersistentSettings';
+
+const PERSISTENTSETTINGSKEY_TAB = 'diffFileViewer.tab';
 
 const props = defineProps<{
   diffFile: DiffFile;
 }>();
 
 enum Tabs {
-  TextDiff,
-  TextSideBySide,
-  ImageSideBySide,
-  ImageSlider,
-  Info,
+  TextDiff = 'textDiff',
+  TextSideBySide = 'textSideBySide',
+  ImageSideBySide = 'imageSideBySide',
+  ImageSlider = 'imageSlider',
+  Info = 'info',
 }
 
 const fileFormats = computed<FileFormat[]>(() =>
@@ -45,8 +48,16 @@ watch(availableTabs, (newTabs) => {
   currentTab.value = newTabs[0]!;
 });
 
+watch(currentTab, (newTab) => {
+  PersistentSettings.saveEnumValue(PERSISTENTSETTINGSKEY_TAB, Tabs, newTab);
+});
+
 onMounted(() => {
-  currentTab.value = availableTabs.value[0]!;
+  const tab = PersistentSettings.loadEnumValue(PERSISTENTSETTINGSKEY_TAB, Tabs);
+  currentTab.value =
+    tab !== null && availableTabs.value.includes(tab)
+      ? tab
+      : availableTabs.value[0]!;
 });
 </script>
 <template>
