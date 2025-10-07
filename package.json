@@ -22,7 +22,7 @@
     "js-beautify": "^1.15.4",
     "jszip": "^3.10.1",
     "mitt": "^3.0.1",
-    "vue": "^3.5.20"
+    "vue": "^3.5.22"
   },
   "devDependencies": {
     "@types/bootstrap": "^5.2.10",
@@ -30,9 +30,9 @@
     "@vitejs/plugin-vue": "^6.0.1",
     "@vue/tsconfig": "^0.8.1",
     "prettier": "^3.6.2",
-    "sass-embedded": "^1.91.0",
-    "typescript": "^5.9.2",
-    "vite": "^7.1.4",
-    "vue-tsc": "^3.0.6"
+    "sass-embedded": "^1.93.2",
+    "typescript": "^5.9.3",
+    "vite": "^7.1.9",
+    "vue-tsc": "^3.1.1"
   }
 }
