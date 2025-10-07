@@ -43,7 +43,9 @@ onUnmounted(() => {
     <div class="modal-dialog modal-xl modal-dialog-scrollable">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">{{ diffFile?.name }}</h5>
+          <h5 class="modal-title">
+            <code>{{ diffFile?.path }}</code>
+          </h5>
           <FullScreenToggle />
           <button
             type="button"
